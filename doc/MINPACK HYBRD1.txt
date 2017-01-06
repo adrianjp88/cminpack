@@ -1,0 +1,256 @@
+               Documentation for MINPACK subroutine HYBRD1
+                         Double precision version
+                       Argonne National Laboratory
+          Burton S. Garbow, Kenneth E. Hillstrom, Jorge J. More
+                                March 1980
+ 
+  1. Purpose.
+        The purpose of HYBRD1 is to find a zero of a system of N non-
+        linear functions in N variables by a modification of the Powell
+        hybrid method.  This is done by using the more general nonlinear
+        equation solver HYBRD.  The user must provide a subroutine which
+        calculates the functions.  The Jacobian is then calculated by a
+        forward-difference approximation.
+ 
+  2. Subroutine and type statements.
+        SUBROUTINE HYBRD1(FCN,N,X,FVEC,TOL,INFO,WA,LWA)
+        INTEGER N,INFO,LWA
+        DOUBLE PRECISION TOL
+        DOUBLE PRECISION X(N),FVEC(N),WA(LWA)
+        EXTERNAL FCN
+ 
+  3. Parameters.
+        Parameters designated as input parameters must be specified on
+        entry to HYBRD1 and are not changed on exit, while parameters
+        designated as output parameters need not be specified on entry
+        and are set to appropriate values on exit from HYBRD1.
+        FCN is the name of the user-supplied subroutine which calculate
+          the functions.  FCN must be declared in an EXTERNAL statement
+          in the user calling program, and should be written as follows
+          SUBROUTINE FCN(N,X,FVEC,IFLAG)
+          INTEGER N,IFLAG
+          DOUBLE PRECISION X(N),FVEC(N)
+          ----------
+          CALCULATE THE FUNCTIONS AT X AND
+          RETURN THIS VECTOR IN FVEC.
+          ----------
+          RETURN
+          END
+          The value of IFLAG should not be changed by FCN unless the
+          user wants to terminate execution of HYBRD1.  In this case set
+          IFLAG to a negative integer.
+ 
+                                                                  Page
+        N is a positive integer input variable set to the number of
+          functions and variables.
+        X is an array of length N.  On input X must contain an initial
+          estimate of the solution vector.  On output X contains the
+          final estimate of the solution vector.
+        FVEC is an output array of length N which contains the function
+          evaluated at the output X.
+        TOL is a nonnegative input variable.  Termination occurs when
+          the algorithm estimates that the relative error between X and
+          the solution is at most TOL.  Section 4 contains more details
+          about TOL.
+        INFO is an integer output variable.  If the user has terminated
+          execution, INFO is set to the (negative) value of IFLAG.  See
+          description of FCN.  Otherwise, INFO is set as follows.
+          INFO = 0  Improper input parameters.
+          INFO = 1  Algorithm estimates that the relative error between
+                    X and the solution is at most TOL.
+          INFO = 2  Number of calls to FCN has reached or exceeded
+                    200*(N+1).
+          INFO = 3  TOL is too small.  No further improvement in the
+                    approximate solution X is possible.
+          INFO = 4  Iteration is not making good progress.
+          Sections 4 and 5 contain more details about INFO.
+        WA is a work array of length LWA.
+        LWA is a positive integer input variable not less than
+          (N*(3*N+13))/2.
+ 
+  4. Successful completion.
+        The accuracy of HYBRD1 is controlled by the convergence parame-
+        ter TOL.  This parameter is used in a test which makes a compar-
+        ison between the approximation X and a solution XSOL.  HYBRD1
+        terminates when the test is satisfied.  If TOL is less than the
+        machine precision (as defined by the MINPACK function
+        DPMPAR(1)), then HYBRD1 only attempts to satisfy the test
+        defined by the machine precision.  Further progress is not usu-
+        ally possible.  Unless high precision solutions are required,
+        the recommended value for TOL is the square root of the machine
+        precision.
+        The test assumes that the functions are reasonably well behaved
+ 
+                                                                  Page
+        If this condition is not satisfied, then HYBRD1 may incorrectly
+        indicate convergence.  The validity of the answer can be
+        checked, for example, by rerunning HYBRD1 with a tighter toler-
+        ance.
+        Convergence test.  If ENORM(Z) denotes the Euclidean norm of a
+          vector Z, then this test attempts to guarantee that
+                ENORM(X-XSOL) .LE. TOL*ENORM(XSOL).
+          If this condition is satisfied with TOL = 10**(-K), then the
+          larger components of X have K significant decimal digits and
+          INFO is set to 1.  There is a danger that the smaller compo-
+          nents of X may have large relative errors, but the fast rate
+          of convergence of HYBRD1 usually avoids this possibility.
+ 
+  5. Unsuccessful completion.
+        Unsuccessful termination of HYBRD1 can be due to improper input
+        parameters, arithmetic interrupts, an excessive number of func-
+        tion evaluations, errors in the functions, or lack of good prog
+        ress.
+        Improper input parameters.  INFO is set to 0 if N .LE. 0, or
+          TOL .LT. 0.D0, or LWA .LT. (N*(3*N+13))/2.
+        Arithmetic interrupts.  If these interrupts occur in the FCN
+          subroutine during an early stage of the computation, they may
+          be caused by an unacceptable choice of X by HYBRD1.  In this
+          case, it may be possible to remedy the situation by not evalu-
+          ating the functions here, but instead setting the components
+          of FVEC to numbers that exceed those in the initial FVEC,
+          thereby indirectly reducing the step length.  The step length
+          can be more directly controlled by using instead HYBRD, which
+          includes in its calling sequence the step-length- governing
+          parameter FACTOR.
+        Excessive number of function evaluations.  If the number of
+          calls to FCN reaches 200*(N+1), then this indicates that the
+          routine is converging very slowly as measured by the progress
+          of FVEC, and INFO is set to 2.  This situation should be unu-
+          sual because, as indicated below, lack of good progress is
+          usually diagnosed earlier by HYBRD1, causing termination with
+          INFO = 4.
+        Errors in the functions.  The choice of step length in the for-
+          ward-difference approximation to the Jacobian assumes that th
+          relative errors in the functions are of the order of the
+          machine precision.  If this is not the case, HYBRD1 may fail
+          (usually with INFO = 4).  The user should then use HYBRD
+          instead, or one of the programs which require the analytic
+          Jacobian (HYBRJ1 and HYBRJ).
+ 
+                                                                  Page
+        Lack of good progress.  HYBRD1 searches for a zero of the system
+          by minimizing the sum of the squares of the functions.  In so
+          doing, it can become trapped in a region where the minimum
+          does not correspond to a zero of the system and, in this situ-
+          ation, the iteration eventually fails to make good progress.
+          In particular, this will happen if the system does not have a
+          zero.  If the system has a zero, rerunning HYBRD1 from a dif-
+          ferent starting point may be helpful.
+ 
+  6. Characteristics of the algorithm.
+        HYBRD1 is a modification of the Powell hybrid method.  Two of
+        its main characteristics involve the choice of the correction a
+        a convex combination of the Newton and scaled gradient direc-
+        tions, and the updating of the Jacobian by the rank-1 method of
+        Broyden.  The choice of the correction guarantees (under reason
+        able conditions) global convergence for starting points far fro
+        the solution and a fast rate of convergence.  The Jacobian is
+        approximated by forward differences at the starting point, but
+        forward differences are not used again until the rank-1 method
+        fails to produce satisfactory progress.
+        Timing.  The time required by HYBRD1 to solve a given problem
+          depends on N, the behavior of the functions, the accuracy
+          requested, and the starting point.  The number of arithmetic
+          operations needed by HYBRD1 is about 11.5*(N**2) to process
+          each call to FCN.  Unless FCN can be evaluated quickly, the
+          timing of HYBRD1 will be strongly influenced by the time spent
+          in FCN.
+        Storage.  HYBRD1 requires (3*N**2 + 17*N)/2 double precision
+          storage locations, in addition to the storage required by the
+          program.  There are no internally declared storage arrays.
+ 
+  7. Subprograms required.
+        USER-supplied ...... FCN
+        MINPACK-supplied ... DOGLEG,DPMPAR,ENORM,FDJAC1,HYBRD,
+                             QFORM,QRFAC,R1MPYQ,R1UPDT
+        FORTRAN-supplied ... DABS,DMAX1,DMIN1,DSQRT,MIN0,MOD
+ 
+  8. References.
+        M. J. D. Powell, A Hybrid Method for Nonlinear Equations.
+        Numerical Methods for Nonlinear Algebraic Equations,
+        P. Rabinowitz, editor. Gordon and Breach, 1970.
+ 
+  9. Example.
+ 
+                                                                  Page
+        The problem is to determine the values of x(1), x(2), ..., x(9)
+        which solve the system of tridiagonal equations
+        (3-2*x(1))*x(1)           -2*x(2)                   = -1
+                -x(i-1) + (3-2*x(i))*x(i)         -2*x(i+1) = -1, i=2-8
+                                    -x(8) + (3-2*x(9))*x(9) = -1
+  C     **********
+  C
+  C     DRIVER FOR HYBRD1 EXAMPLE.
+  C     DOUBLE PRECISION VERSION
+  C
+  C     **********
+        INTEGER J,N,INFO,LWA,NWRITE
+        DOUBLE PRECISION TOL,FNORM
+        DOUBLE PRECISION X(9),FVEC(9),WA(180)
+        DOUBLE PRECISION ENORM,DPMPAR
+        EXTERNAL FCN
+  C
+  C     LOGICAL OUTPUT UNIT IS ASSUMED TO BE NUMBER 6.
+  C
+        DATA NWRITE /6/
+  C
+        N = 9
+  C
+  C     THE FOLLOWING STARTING VALUES PROVIDE A ROUGH SOLUTION.
+  C
+        DO 10 J = 1, 9
+           X(J) = -1.D0
+     10    CONTINUE
+  C
+        LWA = 180
+  C
+  C     SET TOL TO THE SQUARE ROOT OF THE MACHINE PRECISION.
+  C     UNLESS HIGH PRECISION SOLUTIONS ARE REQUIRED,
+  C     THIS IS THE RECOMMENDED SETTING.
+  C
+        TOL = DSQRT(DPMPAR(1))
+  C
+        CALL HYBRD1(FCN,N,X,FVEC,TOL,INFO,WA,LWA)
+        FNORM = ENORM(N,FVEC)
+        WRITE (NWRITE,1000) FNORM,INFO,(X(J),J=1,N)
+        STOP
+   1000 FORMAT (5X,31H FINAL L2 NORM OF THE RESIDUALS,D15.7 //
+       *        5X,15H EXIT PARAMETER,16X,I10 //
+       *        5X,27H FINAL APPROXIMATE SOLUTION // (5X,3D15.7))
+  C
+  C     LAST CARD OF DRIVER FOR HYBRD1 EXAMPLE.
+  C
+        END
+        SUBROUTINE FCN(N,X,FVEC,IFLAG)
+        INTEGER N,IFLAG
+        DOUBLE PRECISION X(N),FVEC(N)
+  C
+ 
+                                                                  Page
+  C     SUBROUTINE FCN FOR HYBRD1 EXAMPLE.
+  C
+        INTEGER K
+        DOUBLE PRECISION ONE,TEMP,TEMP1,TEMP2,THREE,TWO,ZERO
+        DATA ZERO,ONE,TWO,THREE /0.D0,1.D0,2.D0,3.D0/
+  C
+        DO 10 K = 1, N
+           TEMP = (THREE - TWO*X(K))*X(K)
+           TEMP1 = ZERO
+           IF (K .NE. 1) TEMP1 = X(K-1)
+           TEMP2 = ZERO
+           IF (K .NE. N) TEMP2 = X(K+1)
+           FVEC(K) = TEMP - TEMP1 - TWO*TEMP2 + ONE
+     10    CONTINUE
+        RETURN
+  C
+  C     LAST CARD OF SUBROUTINE FCN.
+  C
+        END
+        Results obtained with different compilers or machines
+        may be slightly different.
+        FINAL L2 NORM OF THE RESIDUALS  0.1192636D-07
+        EXIT PARAMETER                         1
+        FINAL APPROXIMATE SOLUTION
+        -0.5706545D+00 -0.6816283D+00 -0.7017325D+00
+        -0.7042129D+00 -0.7013690D+00 -0.6918656D+00
+        -0.6657920D+00 -0.5960342D+00 -0.4164121D+00

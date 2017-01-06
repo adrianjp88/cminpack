@@ -1,0 +1,317 @@
+               Documentation for MINPACK subroutine LMDER1
+                         Double precision version
+                       Argonne National Laboratory
+          Burton S. Garbow, Kenneth E. Hillstrom, Jorge J. More
+                                March 1980
+ 
+  1. Purpose.
+        The purpose of LMDER1 is to minimize the sum of the squares of
+        nonlinear functions in N variables by a modification of the
+        Levenberg-Marquardt algorithm.  This is done by using the more
+        general least-squares solver LMDER.  The user must provide a
+        subroutine which calculates the functions and the Jacobian.
+ 
+  2. Subroutine and type statements.
+        SUBROUTINE LMDER1(FCN,M,N,X,FVEC,FJAC,LDFJAC,TOL,
+       *                  INFO,IPVT,WA,LWA)
+        INTEGER M,N,LDFJAC,INFO,LWA
+        INTEGER IPVT(N)
+        DOUBLE PRECISION TOL
+        DOUBLE PRECISION X(N),FVEC(M),FJAC(LDFJAC,N),WA(LWA)
+        EXTERNAL FCN
+ 
+  3. Parameters.
+        Parameters designated as input parameters must be specified on
+        entry to LMDER1 and are not changed on exit, while parameters
+        designated as output parameters need not be specified on entry
+        and are set to appropriate values on exit from LMDER1.
+        FCN is the name of the user-supplied subroutine which calculate
+          the functions and the Jacobian.  FCN must be declared in an
+          EXTERNAL statement in the user calling program, and should be
+          written as follows.
+          SUBROUTINE FCN(M,N,X,FVEC,FJAC,LDFJAC,IFLAG)
+          INTEGER M,N,LDFJAC,IFLAG
+          DOUBLE PRECISION X(N),FVEC(M),FJAC(LDFJAC,N)
+          ----------
+          IF IFLAG = 1 CALCULATE THE FUNCTIONS AT X AND
+          RETURN THIS VECTOR IN FVEC.  DO NOT ALTER FJAC.
+          IF IFLAG = 2 CALCULATE THE JACOBIAN AT X AND
+          RETURN THIS MATRIX IN FJAC.  DO NOT ALTER FVEC.
+          ----------
+          RETURN
+          END
+ 
+                                                                  Page
+          The value of IFLAG should not be changed by FCN unless the
+          user wants to terminate execution of LMDER1.  In this case set
+          IFLAG to a negative integer.
+        M is a positive integer input variable set to the number of
+          functions.
+        N is a positive integer input variable set to the number of
+          variables.  N must not exceed M.
+        X is an array of length N.  On input X must contain an initial
+          estimate of the solution vector.  On output X contains the
+          final estimate of the solution vector.
+        FVEC is an output array of length M which contains the function
+          evaluated at the output X.
+        FJAC is an output M by N array.  The upper N by N submatrix of
+          FJAC contains an upper triangular matrix R with diagonal ele-
+          ments of nonincreasing magnitude such that
+                 T     T           T
+                P *(JAC *JAC)*P = R *R,
+          where P is a permutation matrix and JAC is the final calcu-
+          lated Jacobian.  Column j of P is column IPVT(j) (see below)
+          of the identity matrix.  The lower trapezoidal part of FJAC
+          contains information generated during the computation of R.
+        LDFJAC is a positive integer input variable not less than M
+          which specifies the leading dimension of the array FJAC.
+        TOL is a nonnegative input variable.  Termination occurs when
+          the algorithm estimates either that the relative error in the
+          sum of squares is at most TOL or that the relative error
+          between X and the solution is at most TOL.  Section 4 contain
+          more details about TOL.
+        INFO is an integer output variable.  If the user has terminated
+          execution, INFO is set to the (negative) value of IFLAG.  See
+          description of FCN.  Otherwise, INFO is set as follows.
+          INFO = 0  Improper input parameters.
+          INFO = 1  Algorithm estimates that the relative error in the
+                    sum of squares is at most TOL.
+          INFO = 2  Algorithm estimates that the relative error between
+                    X and the solution is at most TOL.
+          INFO = 3  Conditions for INFO = 1 and INFO = 2 both hold.
+          INFO = 4  FVEC is orthogonal to the columns of the Jacobian t
+                    machine precision.
+ 
+                                                                  Page
+          INFO = 5  Number of calls to FCN with IFLAG = 1 has reached
+                    100*(N+1).
+          INFO = 6  TOL is too small.  No further reduction in the sum
+                    of squares is possible.
+          INFO = 7  TOL is too small.  No further improvement in the
+                    approximate solution X is possible.
+          Sections 4 and 5 contain more details about INFO.
+        IPVT is an integer output array of length N.  IPVT defines a
+          permutation matrix P such that JAC*P = Q*R, where JAC is the
+          final calculated Jacobian, Q is orthogonal (not stored), and
+          is upper triangular with diagonal elements of nonincreasing
+          magnitude.  Column j of P is column IPVT(j) of the identity
+          matrix.
+        WA is a work array of length LWA.
+        LWA is a positive integer input variable not less than 5*N+M.
+ 
+  4. Successful completion.
+        The accuracy of LMDER1 is controlled by the convergence parame-
+        ter TOL.  This parameter is used in tests which make three type
+        of comparisons between the approximation X and a solution XSOL.
+        LMDER1 terminates when any of the tests is satisfied.  If TOL i
+        less than the machine precision (as defined by the MINPACK func-
+        tion DPMPAR(1)), then LMDER1 only attempts to satisfy the test
+        defined by the machine precision.  Further progress is not usu-
+        ally possible.  Unless high precision solutions are required,
+        the recommended value for TOL is the square root of the machine
+        precision.
+        The tests assume that the functions and the Jacobian are coded
+        consistently, and that the functions are reasonably well
+        behaved.  If these conditions are not satisfied, then LMDER1 ma
+        incorrectly indicate convergence.  The coding of the Jacobian
+        can be checked by the MINPACK subroutine CHKDER.  If the Jaco-
+        bian is coded correctly, then the validity of the answer can be
+        checked, for example, by rerunning LMDER1 with a tighter toler-
+        ance.
+        First convergence test.  If ENORM(Z) denotes the Euclidean norm
+          of a vector Z, then this test attempts to guarantee that
+                ENORM(FVEC) .LE. (1+TOL)*ENORM(FVECS),
+          where FVECS denotes the functions evaluated at XSOL.  If this
+          condition is satisfied with TOL = 10**(-K), then the final
+          residual norm ENORM(FVEC) has K significant decimal digits an
+          INFO is set to 1 (or to 3 if the second test is also
+ 
+                                                                  Page
+          satisfied).
+        Second convergence test.  If D is a diagonal matrix (implicitly
+          generated by LMDER1) whose entries contain scale factors for
+          the variables, then this test attempts to guarantee that
+                ENORM(D*(X-XSOL)) .LE. TOL*ENORM(D*XSOL).
+          If this condition is satisfied with TOL = 10**(-K), then the
+          larger components of D*X have K significant decimal digits an
+          INFO is set to 2 (or to 3 if the first test is also satis-
+          fied).  There is a danger that the smaller components of D*X
+          may have large relative errors, but the choice of D is such
+          that the accuracy of the components of X is usually related t
+          their sensitivity.
+        Third convergence test.  This test is satisfied when FVEC is
+          orthogonal to the columns of the Jacobian to machine preci-
+          sion.  There is no clear relationship between this test and
+          the accuracy of LMDER1, and furthermore, the test is equally
+          well satisfied at other critical points, namely maximizers an
+          saddle points.  Therefore, termination caused by this test
+          (INFO = 4) should be examined carefully.
+ 
+  5. Unsuccessful completion.
+        Unsuccessful termination of LMDER1 can be due to improper input
+        parameters, arithmetic interrupts, or an excessive number of
+        function evaluations.
+        Improper input parameters.  INFO is set to 0 if N .LE. 0, or
+          M .LT. N, or LDFJAC .LT. M, or TOL .LT. 0.D0, or
+          LWA .LT. 5*N+M.
+        Arithmetic interrupts.  If these interrupts occur in the FCN
+          subroutine during an early stage of the computation, they may
+          be caused by an unacceptable choice of X by LMDER1.  In this
+          case, it may be possible to remedy the situation by not evalu-
+          ating the functions here, but instead setting the components
+          of FVEC to numbers that exceed those in the initial FVEC,
+          thereby indirectly reducing the step length.  The step length
+          can be more directly controlled by using instead LMDER, which
+          includes in its calling sequence the step-length- governing
+          parameter FACTOR.
+        Excessive number of function evaluations.  If the number of
+          calls to FCN with IFLAG = 1 reaches 100*(N+1), then this indi-
+          cates that the routine is converging very slowly as measured
+          by the progress of FVEC, and INFO is set to 5.  In this case,
+          it may be helpful to restart LMDER1, thereby forcing it to
+          disregard old (and possibly harmful) information.
+ 
+ 
+                                                                  Page
+  6. Characteristics of the algorithm.
+        LMDER1 is a modification of the Levenberg-Marquardt algorithm.
+        Two of its main characteristics involve the proper use of
+        implicitly scaled variables and an optimal choice for the cor-
+        rection.  The use of implicitly scaled variables achieves scale
+        invariance of LMDER1 and limits the size of the correction in
+        any direction where the functions are changing rapidly.  The
+        optimal choice of the correction guarantees (under reasonable
+        conditions) global convergence from starting points far from th
+        solution and a fast rate of convergence for problems with small
+        residuals.
+        Timing.  The time required by LMDER1 to solve a given problem
+          depends on M and N, the behavior of the functions, the accu-
+          racy requested, and the starting point.  The number of arith-
+          metic operations needed by LMDER1 is about N**3 to process
+          each evaluation of the functions (call to FCN with IFLAG = 1)
+          and M*(N**2) to process each evaluation of the Jacobian (call
+          to FCN with IFLAG = 2).  Unless FCN can be evaluated quickly,
+          the timing of LMDER1 will be strongly influenced by the time
+          spent in FCN.
+        Storage.  LMDER1 requires M*N + 2*M + 6*N double precision sto-
+          rage locations and N integer storage locations, in addition t
+          the storage required by the program.  There are no internally
+          declared storage arrays.
+ 
+  7. Subprograms required.
+        USER-supplied ...... FCN
+        MINPACK-supplied ... DPMPAR,ENORM,LMDER,LMPAR,QRFAC,QRSOLV
+        FORTRAN-supplied ... DABS,DMAX1,DMIN1,DSQRT,MOD
+ 
+  8. References.
+        Jorge J. More, The Levenberg-Marquardt Algorithm, Implementation
+        and Theory. Numerical Analysis, G. A. Watson, editor.
+        Lecture Notes in Mathematics 630, Springer-Verlag, 1977.
+ 
+  9. Example.
+        The problem is to determine the values of x(1), x(2), and x(3)
+        which provide the best fit (in the least squares sense) of
+              x(1) + u(i)/(v(i)*x(2) + w(i)*x(3)),  i = 1, 15
+        to the data
+ 
+                                                                  Page
+              y = (0.14,0.18,0.22,0.25,0.29,0.32,0.35,0.39,
+                   0.37,0.58,0.73,0.96,1.34,2.10,4.39),
+        where u(i) = i, v(i) = 16 - i, and w(i) = min(u(i),v(i)).  The
+        i-th component of FVEC is thus defined by
+              y(i) - (x(1) + u(i)/(v(i)*x(2) + w(i)*x(3))).
+  C     **********
+  C
+  C     DRIVER FOR LMDER1 EXAMPLE.
+  C     DOUBLE PRECISION VERSION
+  C
+  C     **********
+        INTEGER J,M,N,LDFJAC,INFO,LWA,NWRITE
+        INTEGER IPVT(3)
+        DOUBLE PRECISION TOL,FNORM
+        DOUBLE PRECISION X(3),FVEC(15),FJAC(15,3),WA(30)
+        DOUBLE PRECISION ENORM,DPMPAR
+        EXTERNAL FCN
+  C
+  C     LOGICAL OUTPUT UNIT IS ASSUMED TO BE NUMBER 6.
+  C
+        DATA NWRITE /6/
+  C
+        M = 15
+        N = 3
+  C
+  C     THE FOLLOWING STARTING VALUES PROVIDE A ROUGH FIT.
+  C
+        X(1) = 1.D0
+        X(2) = 1.D0
+        X(3) = 1.D0
+  C
+        LDFJAC = 15
+        LWA = 30
+  C
+  C     SET TOL TO THE SQUARE ROOT OF THE MACHINE PRECISION.
+  C     UNLESS HIGH PRECISION SOLUTIONS ARE REQUIRED,
+  C     THIS IS THE RECOMMENDED SETTING.
+  C
+        TOL = DSQRT(DPMPAR(1))
+  C
+        CALL LMDER1(FCN,M,N,X,FVEC,FJAC,LDFJAC,TOL,
+       *            INFO,IPVT,WA,LWA)
+        FNORM = ENORM(M,FVEC)
+        WRITE (NWRITE,1000) FNORM,INFO,(X(J),J=1,N)
+        STOP
+   1000 FORMAT (5X,31H FINAL L2 NORM OF THE RESIDUALS,D15.7 //
+       *        5X,15H EXIT PARAMETER,16X,I10 //
+       *        5X,27H FINAL APPROXIMATE SOLUTION // 5X,3D15.7)
+  C
+  C     LAST CARD OF DRIVER FOR LMDER1 EXAMPLE.
+  C
+ 
+                                                                  Page
+        END
+        SUBROUTINE FCN(M,N,X,FVEC,FJAC,LDFJAC,IFLAG)
+        INTEGER M,N,LDFJAC,IFLAG
+        DOUBLE PRECISION X(N),FVEC(M),FJAC(LDFJAC,N)
+  C
+  C     SUBROUTINE FCN FOR LMDER1 EXAMPLE.
+  C
+        INTEGER I
+        DOUBLE PRECISION TMP1,TMP2,TMP3,TMP4
+        DOUBLE PRECISION Y(15)
+        DATA Y(1),Y(2),Y(3),Y(4),Y(5),Y(6),Y(7),Y(8),
+       *     Y(9),Y(10),Y(11),Y(12),Y(13),Y(14),Y(15)
+       *     /1.4D-1,1.8D-1,2.2D-1,2.5D-1,2.9D-1,3.2D-1,3.5D-1,3.9D-1,
+       *      3.7D-1,5.8D-1,7.3D-1,9.6D-1,1.34D0,2.1D0,4.39D0/
+  C
+        IF (IFLAG .EQ. 2) GO TO 20
+        DO 10 I = 1, 15
+           TMP1 = I
+           TMP2 = 16 - I
+           TMP3 = TMP1
+           IF (I .GT. 8) TMP3 = TMP2
+           FVEC(I) = Y(I) - (X(1) + TMP1/(X(2)*TMP2 + X(3)*TMP3))
+     10    CONTINUE
+        GO TO 40
+     20 CONTINUE
+        DO 30 I = 1, 15
+           TMP1 = I
+           TMP2 = 16 - I
+           TMP3 = TMP1
+           IF (I .GT. 8) TMP3 = TMP2
+           TMP4 = (X(2)*TMP2 + X(3)*TMP3)**2
+           FJAC(I,1) = -1.D0
+           FJAC(I,2) = TMP1*TMP2/TMP4
+           FJAC(I,3) = TMP1*TMP3/TMP4
+     30    CONTINUE
+     40 CONTINUE
+        RETURN
+  C
+  C     LAST CARD OF SUBROUTINE FCN.
+  C
+        END
+        Results obtained with different compilers or machines
+        may be slightly different.
+        FINAL L2 NORM OF THE RESIDUALS  0.9063596D-01
+        EXIT PARAMETER                         1
+        FINAL APPROXIMATE SOLUTION
+         0.8241058D-01  0.1133037D+01  0.2343695D+01

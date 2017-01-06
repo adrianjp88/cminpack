@@ -1,0 +1,335 @@
+                Documentation for MINPACK subroutine HYBRJ
+                         Double precision version
+                       Argonne National Laboratory
+          Burton S. Garbow, Kenneth E. Hillstrom, Jorge J. More
+                                March 1980
+ 
+  1. Purpose.
+        The purpose of HYBRJ is to find a zero of a system of N non-
+        linear functions in N variables by a modification of the Powell
+        hybrid method.  The user must provide a subroutine which calcu-
+        lates the functions and the Jacobian.
+ 
+  2. Subroutine and type statements.
+        SUBROUTINE HYBRJ(FCN,N,X,FVEC,FJAC,LDFJAC,XTOL,MAXFEV,DIAG,
+       *                 MODE,FACTOR,NPRINT,INFO,NFEV,NJEV,R,LR,QTF,
+       *                 WA1,WA2,WA3,WA4)
+        INTEGER N,LDFJAC,MAXFEV,MODE,NPRINT,INFO,NFEV,NJEV,LR
+        DOUBLE PRECISION XTOL,FACTOR
+        DOUBLE PRECISION X(N),FVEC(N),FJAC(LDFJAC,N),DIAG(N),R(LR),QTF(
+       *                 WA1(N),WA2(N),WA3(N),WA4(N)
+ 
+  3. Parameters.
+        Parameters designated as input parameters must be specified on
+        entry to HYBRJ and are not changed on exit, while parameters
+        designated as output parameters need not be specified on entry
+        and are set to appropriate values on exit from HYBRJ.
+        FCN is the name of the user-supplied subroutine which calculate
+          the functions and the Jacobian.  FCN must be declared in an
+          EXTERNAL statement in the user calling program, and should be
+          written as follows.
+          SUBROUTINE FCN(N,X,FVEC,FJAC,LDFJAC,IFLAG)
+          INTEGER N,LDFJAC,IFLAG
+          DOUBLE PRECISION X(N),FVEC(N),FJAC(LDFJAC,N)
+          ----------
+          IF IFLAG = 1 CALCULATE THE FUNCTIONS AT X AND
+          RETURN THIS VECTOR IN FVEC.  DO NOT ALTER FJAC.
+          IF IFLAG = 2 CALCULATE THE JACOBIAN AT X AND
+          RETURN THIS MATRIX IN FJAC.  DO NOT ALTER FVEC.
+          ----------
+          RETURN
+          END
+ 
+                                                                  Page
+          The value of IFLAG should not be changed by FCN unless the
+          user wants to terminate execution of HYBRJ.  In this case set
+          IFLAG to a negative integer.
+        N is a positive integer input variable set to the number of
+          functions and variables.
+        X is an array of length N.  On input X must contain an initial
+          estimate of the solution vector.  On output X contains the
+          final estimate of the solution vector.
+        FVEC is an output array of length N which contains the function
+          evaluated at the output X.
+        FJAC is an output N by N array which contains the orthogonal
+          matrix Q produced by the QR factorization of the final approx-
+          imate Jacobian.  Section 6 contains more details about the
+          approximation to the Jacobian.
+        LDFJAC is a positive integer input variable not less than N
+          which specifies the leading dimension of the array FJAC.
+        XTOL is a nonnegative input variable.  Termination occurs when
+          the relative error between two consecutive iterates is at most
+          XTOL.  Therefore, XTOL measures the relative error desired in
+          the approximate solution.  Section 4 contains more details
+          about XTOL.
+        MAXFEV is a positive integer input variable.  Termination occur
+          when the number of calls to FCN with IFLAG = 1 has reached
+          MAXFEV.
+        DIAG is an array of length N.  If MODE = 1 (see below), DIAG is
+          internally set.  If MODE = 2, DIAG must contain positive
+          entries that serve as multiplicative scale factors for the
+          variables.
+        MODE is an integer input variable.  If MODE = 1, the variables
+          will be scaled internally.  If MODE = 2, the scaling is speci-
+          fied by the input DIAG.  Other values of MODE are equivalent
+          to MODE = 1.
+        FACTOR is a positive input variable used in determining the ini-
+          tial step bound.  This bound is set to the product of FACTOR
+          and the Euclidean norm of DIAG*X if nonzero, or else to FACTO
+          itself.  In most cases FACTOR should lie in the interval
+          (.1,100.).  100. is a generally recommended value.
+        NPRINT is an integer input variable that enables controlled
+          printing of iterates if it is positive.  In this case, FCN is
+          called with IFLAG = 0 at the beginning of the first iteration
+          and every NPRINT iterations thereafter and immediately prior
+          to return, with X and FVEC available for printing.  FVEC and
+          FJAC should not be altered.  If NPRINT is not positive, no
+ 
+                                                                  Page
+          special calls of FCN with IFLAG = 0 are made.
+        INFO is an integer output variable.  If the user has terminated
+          execution, INFO is set to the (negative) value of IFLAG.  See
+          description of FCN.  Otherwise, INFO is set as follows.
+          INFO = 0  Improper input parameters.
+          INFO = 1  Relative error between two consecutive iterates is
+                    at most XTOL.
+          INFO = 2  Number of calls to FCN with IFLAG = 1 has reached
+                    MAXFEV.
+          INFO = 3  XTOL is too small.  No further improvement in the
+                    approximate solution X is possible.
+          INFO = 4  Iteration is not making good progress, as measured
+                    by the improvement from the last five Jacobian eval-
+                    uations.
+          INFO = 5  Iteration is not making good progress, as measured
+                    by the improvement from the last ten iterations.
+          Sections 4 and 5 contain more details about INFO.
+        NFEV is an integer output variable set to the number of calls t
+          FCN with IFLAG = 1.
+        NJEV is an integer output variable set to the number of calls t
+          FCN with IFLAG = 2.
+        R is an output array of length LR which contains the upper
+          triangular matrix produced by the QR factorization of the
+          final approximate Jacobian, stored rowwise.
+        LR is a positive integer input variable not less than
+          (N*(N+1))/2.
+        QTF is an output array of length N which contains the vector
+          (Q transpose)*FVEC.
+        WA1, WA2, WA3, and WA4 are work arrays of length N.
+ 
+  4. Successful completion.
+        The accuracy of HYBRJ is controlled by the convergence parameter
+        XTOL.  This parameter is used in a test which makes a comparison
+        between the approximation X and a solution XSOL.  HYBRJ termi-
+        nates when the test is satisfied.  If the convergence parameter
+        is less than the machine precision (as defined by the MINPACK
+        function DPMPAR(1)), then HYBRJ only attempts to satisfy the
+        test defined by the machine precision.  Further progress is not
+ 
+                                                                  Page
+        usually possible.
+        The test assumes that the functions and the Jacobian are coded
+        consistently, and that the functions are reasonably well
+        behaved.  If these conditions are not satisfied, then HYBRJ may
+        incorrectly indicate convergence.  The coding of the Jacobian
+        can be checked by the MINPACK subroutine CHKDER.  If the Jaco-
+        bian is coded correctly, then the validity of the answer can be
+        checked, for example, by rerunning HYBRJ with a tighter toler-
+        ance.
+        Convergence test.  If ENORM(Z) denotes the Euclidean norm of a
+          vector Z and D is the diagonal matrix whose entries are
+          defined by the array DIAG, then this test attempts to guaran-
+          tee that
+                ENORM(D*(X-XSOL)) .LE. XTOL*ENORM(D*XSOL).
+          If this condition is satisfied with XTOL = 10**(-K), then the
+          larger components of D*X have K significant decimal digits an
+          INFO is set to 1.  There is a danger that the smaller compo-
+          nents of D*X may have large relative errors, but the fast rat
+          of convergence of HYBRJ usually avoids this possibility.
+          Unless high precision solutions are required, the recommended
+          value for XTOL is the square root of the machine precision.
+ 
+  5. Unsuccessful completion.
+        Unsuccessful termination of HYBRJ can be due to improper input
+        parameters, arithmetic interrupts, an excessive number of func-
+        tion evaluations, or lack of good progress.
+        Improper input parameters.  INFO is set to 0 if N .LE. 0, or
+          LDFJAC .LT. N, or XTOL .LT. 0.D0, or MAXFEV .LE. 0, or
+          FACTOR .LE. 0.D0, or LR .LT. (N*(N+1))/2.
+        Arithmetic interrupts.  If these interrupts occur in the FCN
+          subroutine during an early stage of the computation, they may
+          be caused by an unacceptable choice of X by HYBRJ.  In this
+          case, it may be possible to remedy the situation by rerunning
+          HYBRJ with a smaller value of FACTOR.
+        Excessive number of function evaluations.  A reasonable value
+          for MAXFEV is 100*(N+1).  If the number of calls to FCN with
+          IFLAG = 1 reaches MAXFEV, then this indicates that the routine
+          is converging very slowly as measured by the progress of FVEC
+          and INFO is set to 2.  This situation should be unusual
+          because, as indicated below, lack of good progress is usually
+          diagnosed earlier by HYBRJ, causing termination with INFO = 4
+          or INFO = 5.
+        Lack of good progress.  HYBRJ searches for a zero of the system
+          by minimizing the sum of the squares of the functions.  In so
+ 
+                                                                  Page
+          doing, it can become trapped in a region where the minimum
+          does not correspond to a zero of the system and, in this situ-
+          ation, the iteration eventually fails to make good progress.
+          In particular, this will happen if the system does not have a
+          zero.  If the system has a zero, rerunning HYBRJ from a dif-
+          ferent starting point may be helpful.
+ 
+  6. Characteristics of the algorithm.
+        HYBRJ is a modification of the Powell hybrid method.  Two of it
+        main characteristics involve the choice of the correction as a
+        convex combination of the Newton and scaled gradient directions
+        and the updating of the Jacobian by the rank-1 method of Broy-
+        den.  The choice of the correction guarantees (under reasonable
+        conditions) global convergence for starting points far from the
+        solution and a fast rate of convergence.  The Jacobian is calcu
+        lated at the starting point, but it is not recalculated until
+        the rank-1 method fails to produce satisfactory progress.
+        Timing.  The time required by HYBRJ to solve a given problem
+          depends on N, the behavior of the functions, the accuracy
+          requested, and the starting point.  The number of arithmetic
+          operations needed by HYBRJ is about 11.5*(N**2) to process
+          each evaluation of the functions (call to FCN with IFLAG = 1)
+          and 1.3*(N**3) to process each evaluation of the Jacobian
+          (call to FCN with IFLAG = 2).  Unless FCN can be evaluated
+          quickly, the timing of HYBRJ will be strongly influenced by
+          the time spent in FCN.
+        Storage.  HYBRJ requires (3*N**2 + 17*N)/2 double precision
+          storage locations, in addition to the storage required by the
+          program.  There are no internally declared storage arrays.
+ 
+  7. Subprograms required.
+        USER-supplied ...... FCN
+        MINPACK-supplied ... DOGLEG,DPMPAR,ENORM,
+                             QFORM,QRFAC,R1MPYQ,R1UPDT
+        FORTRAN-supplied ... DABS,DMAX1,DMIN1,DSQRT,MIN0,MOD
+ 
+  8. References.
+        M. J. D. Powell, A Hybrid Method for Nonlinear Equations.
+        Numerical Methods for Nonlinear Algebraic Equations,
+        P. Rabinowitz, editor. Gordon and Breach, 1970.
+ 
+  9. Example.
+ 
+                                                                  Page
+        The problem is to determine the values of x(1), x(2), ..., x(9)
+        which solve the system of tridiagonal equations
+        (3-2*x(1))*x(1)           -2*x(2)                   = -1
+                -x(i-1) + (3-2*x(i))*x(i)         -2*x(i+1) = -1, i=2-8
+                                    -x(8) + (3-2*x(9))*x(9) = -1
+  C     **********
+  C
+  C     DRIVER FOR HYBRJ EXAMPLE.
+  C     DOUBLE PRECISION VERSION
+  C
+  C     **********
+        INTEGER J,N,LDFJAC,MAXFEV,MODE,NPRINT,INFO,NFEV,NJEV,LR,NWRITE
+        DOUBLE PRECISION XTOL,FACTOR,FNORM
+        DOUBLE PRECISION X(9),FVEC(9),FJAC(9,9),DIAG(9),R(45),QTF(9),
+       *                 WA1(9),WA2(9),WA3(9),WA4(9)
+        DOUBLE PRECISION ENORM,DPMPAR
+        EXTERNAL FCN
+  C
+  C     LOGICAL OUTPUT UNIT IS ASSUMED TO BE NUMBER 6.
+  C
+        DATA NWRITE /6/
+  C
+        N = 9
+  C
+  C     THE FOLLOWING STARTING VALUES PROVIDE A ROUGH SOLUTION.
+  C
+        DO 10 J = 1, 9
+           X(J) = -1.D0
+     10    CONTINUE
+  C
+        LDFJAC = 9
+        LR = 45
+  C
+  C     SET XTOL TO THE SQUARE ROOT OF THE MACHINE PRECISION.
+  C     UNLESS HIGH PRECISION SOLUTIONS ARE REQUIRED,
+  C     THIS IS THE RECOMMENDED SETTING.
+  C
+        XTOL = DSQRT(DPMPAR(1))
+  C
+        MAXFEV = 1000
+        MODE = 2
+        DO 20 J = 1, 9
+           DIAG(J) = 1.D0
+     20    CONTINUE
+        FACTOR = 1.D2
+        NPRINT = 0
+  C
+        CALL HYBRJ(FCN,N,X,FVEC,FJAC,LDFJAC,XTOL,MAXFEV,DIAG,
+       *           MODE,FACTOR,NPRINT,INFO,NFEV,NJEV,R,LR,QTF,
+       *           WA1,WA2,WA3,WA4)
+        FNORM = ENORM(N,FVEC)
+        WRITE (NWRITE,1000) FNORM,NFEV,NJEV,INFO,(X(J),J=1,N)
+ 
+                                                                  Page
+        STOP
+   1000 FORMAT (5X,31H FINAL L2 NORM OF THE RESIDUALS,D15.7 //
+       *        5X,31H NUMBER OF FUNCTION EVALUATIONS,I10 //
+       *        5X,31H NUMBER OF JACOBIAN EVALUATIONS,I10 //
+       *        5X,15H EXIT PARAMETER,16X,I10 //
+       *        5X,27H FINAL APPROXIMATE SOLUTION // (5X,3D15.7))
+  C
+  C     LAST CARD OF DRIVER FOR HYBRJ EXAMPLE.
+  C
+        END
+        SUBROUTINE FCN(N,X,FVEC,FJAC,LDFJAC,IFLAG)
+        INTEGER N,LDFJAC,IFLAG
+        DOUBLE PRECISION X(N),FVEC(N),FJAC(LDFJAC,N)
+  C
+  C     SUBROUTINE FCN FOR HYBRJ EXAMPLE.
+  C
+        INTEGER J,K
+        DOUBLE PRECISION ONE,TEMP,TEMP1,TEMP2,THREE,TWO,ZERO
+        DATA ZERO,ONE,TWO,THREE,FOUR /0.D0,1.D0,2.D0,3.D0,4.D0/
+  C
+        IF (IFLAG .NE. 0) GO TO 5
+  C
+  C     INSERT PRINT STATEMENTS HERE WHEN NPRINT IS POSITIVE.
+  C
+        RETURN
+      5 CONTINUE
+        IF (IFLAG .EQ. 2) GO TO 20
+        DO 10 K = 1, N
+           TEMP = (THREE - TWO*X(K))*X(K)
+           TEMP1 = ZERO
+           IF (K .NE. 1) TEMP1 = X(K-1)
+           TEMP2 = ZERO
+           IF (K .NE. N) TEMP2 = X(K+1)
+           FVEC(K) = TEMP - TEMP1 - TWO*TEMP2 + ONE
+     10    CONTINUE
+        GO TO 50
+     20 CONTINUE
+        DO 40 K = 1, N
+           DO 30 J = 1, N
+              FJAC(K,J) = ZERO
+     30       CONTINUE
+           FJAC(K,K) = THREE - FOUR*X(K)
+           IF (K .NE. 1) FJAC(K,K-1) = -ONE
+           IF (K .NE. N) FJAC(K,K+1) = -TWO
+     40    CONTINUE
+     50 CONTINUE
+        RETURN
+  C
+  C     LAST CARD OF SUBROUTINE FCN.
+  C
+        END
+        Results obtained with different compilers or machines
+        may be slightly different.
+ 
+                                                                  Page
+        FINAL L2 NORM OF THE RESIDUALS  0.1192636D-07
+        NUMBER OF FUNCTION EVALUATIONS        11
+        NUMBER OF JACOBIAN EVALUATIONS         1
+        EXIT PARAMETER                         1
+        FINAL APPROXIMATE SOLUTION
+        -0.5706545D+00 -0.6816283D+00 -0.7017325D+00
+        -0.7042129D+00 -0.7013690D+00 -0.6918656D+00
+        -0.6657920D+00 -0.5960342D+00 -0.4164121D+00
