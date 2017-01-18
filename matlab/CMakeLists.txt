@@ -2,9 +2,10 @@
 
 cmake_minimum_required(VERSION 3.7)
 
-find_package( MATLAB REQUIRED MX_LIBRARY REQUIRED)
+find_package( Matlab COMPONENTS MX_LIBRARY REQUIRED )
 
 if(NOT Matlab_MX_LIBRARY)
+	message( STATUS "Matlab Mx Library NOT found - skipping Matlab binding!" )
 	return()
 endif()
 
