@@ -23,6 +23,10 @@ if ~isa(data, 'double')
     data = cast(data,'double');
 end
 
+if ~isa(initial_parameters, 'double')
+    initial_parameters = cast(initial_parameters,'double');
+end
+
 %% run cminpack
 tic;
 [out, info, iteration_count]...
