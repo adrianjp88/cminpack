@@ -11,10 +11,17 @@
 #define GAUSS_2D_ELLIPTIC 2
 #define GAUSS_2D_ROTATED 3
 #define CAUCHY_2D_ELLIPTIC 4
+#define LINEAR_1D 5
+#define FLETCHER_POWELL 6
+#define BROWN_DENNIS 7
+#define	RAMSEY_FIXED_P 8
+#define	RAMSEY_VAR_P 9
+
 
 typedef struct  {
     int size;
     real * data;
+    real * x_data;
 } fcndata_t;
 
 int gauss2d_elliptic(void *p,
@@ -128,13 +135,221 @@ int gauss2d(void *p,
     return 0;
 }
 
+int calculate_ramsey_fixed_p(
+    void * model,
+    int size,
+    int n_parameters,
+    real const * parameters,
+    real * function,
+    real * jacobian,
+    int ldfjac,
+    int iflag)
+{
+    const real * data = ((fcndata_t*)model)->data;
+    const real * x_data = ((fcndata_t*)model)->x_data;
+    real const * p = parameters;
+
+    real const pi = 3.14159;
+
+    //////////////////////////// values //////////////////////////////
+
+    // parameters: [A1 A2 c f1 f2 t2star x1 x2] exp(-(point_index./t2star)^1)*(A1*cos(2*pi*f1*(point_index - x1)) + A2*cos(2*pi*f2*(point_index-x2))) + c
+
+    for (int i = 0; i < size; i++)
+    {
+        real x;
+
+        if (!x_data)
+            x = real(i);
+        else
+            x = x_data[i];
+
+        real const t2arg = x / p[5];
+        real const ex = exp(-t2arg);
+        real const phasearg1 = 2.0 * pi*p[3] * (x - p[6]);
+        real const phasearg2 = 2.0 * pi*p[4] * (x - p[7]);
+        real const cos1 = cos(phasearg1);
+        real const sin1 = sin(phasearg1);
+        real const cos2 = cos(phasearg2);
+        real const sin2 = sin(phasearg2);
+
+        if (iflag != 2)
+        {
+            function[i] = ex*(p[0] * cos1 + p[1] * cos2) + p[2] - data[i]; // formula calculating fit model values
+        }
+        else
+        {
+            /////////////////////////// derivatives ///////////////////////////
+            real * current_jacobian = jacobian + i;
+
+            current_jacobian[0 * size] = ex*cos1; // formula calculating derivative values with respect to parameters[0]
+            current_jacobian[1 * size] = ex*cos2;
+            current_jacobian[2 * size] = 1.0;
+            current_jacobian[3 * size] = -p[0] * 2.0 * pi*(x - p[6])*ex*sin1;
+            current_jacobian[4 * size] = -p[1] * 2.0 * pi*(x - p[7])*ex*sin2;
+            current_jacobian[5 * size] = 1.0 / (p[5] * p[5])*x*ex*(p[0] * cos1 + p[1] * cos2);
+            current_jacobian[6 * size] = p[0] * 2.0 * pi*p[3] * sin1*ex;
+            current_jacobian[7 * size] = p[1] * 2.0 * pi*p[4] * sin2*ex;
+        }
+    }
+    return 0;
+}
+
+int calculate_ramsey_var_p(
+    void * model,
+    int size,
+    int n_parameters,
+    real const * parameters,
+    real * function,
+    real * jacobian,
+    int ldfjac,
+    int iflag)
+{
+    const real * data = ((fcndata_t*)model)->data;
+    const real * x_data = ((fcndata_t*)model)->x_data;
+    real const * p = parameters;
+
+    real const pi = 3.14159;
+
+    ///////////////////////////// values //////////////////////////////
+
+    // parameters: [A1 A2 c f1 f2 p t2star x1 x2] exp(-(x./t2star)^p)*(A1*cos(2*pi*f1*(x - x1)) + A2*cos(2*pi*f2*(x-x2))) + c
+    for (int i = 0; i < size; i++)
+    {
+        real x;
+
+        if (!x_data)
+            x = real(i);
+        else
+            x = x_data[i];
+
+        real const pi = 3.14159;
+        real const t2arg = pow(x / p[6], p[5]);
+        real const ex = exp(-t2arg);
+        real const phasearg1 = 2 * pi*p[3] * (x - p[7]);
+        real const phasearg2 = 2 * pi*p[4] * (x - p[8]);
+        real const cos1 = cos(phasearg1);
+        real const sin1 = sin(phasearg1);
+        real const cos2 = cos(phasearg2);
+        real const sin2 = sin(phasearg2);
+        //real const xmin = x/p[6] - 1;
+        //real const log = xmin - xmin*xmin/2.f + xmin*xmin*xmin/3.f - xmin*xmin*xmin*xmin/4.f;
+
+        if (iflag != 2)
+        {
+            function[i] = ex*(p[0] * cos1 + p[1] * cos2) + p[2] - data[i]; // formula calculating fit model values
+        }
+        else
+        {
+            /////////////////////////// derivatives ///////////////////////////
+            real * current_jacobian = jacobian + i;
+            current_jacobian[0 * size] = ex*cos1;
+            current_jacobian[1 * size] = ex*cos2;
+            current_jacobian[2 * size] = 1.f;
+            current_jacobian[3 * size] = -p[0] * 2 * pi*(x - p[7])*ex*sin1;
+            current_jacobian[4 * size] = -p[1] * 2 * pi*(x - p[8])*ex*sin2;
+            current_jacobian[5 * size] = -log(x / p[6] + 0.000001)*ex*t2arg*(p[0] * cos1 + p[1] * cos2);
+            current_jacobian[6 * size] = p[5] * 1.f / (p[6] * p[6])*x*ex*pow(x / p[6], p[5] - 1)*(p[0] * cos1 + p[1] * cos2);
+            current_jacobian[7 * size] = p[0] * 2 * pi*p[3] * sin1*ex;
+            current_jacobian[8 * size] = p[1] * 2 * pi*p[4] * sin2*ex;
+        }
+    }
+    return 0;
+}
+
+int calculate_fletcher_powell(
+    void * model,
+    int size,
+    int n_parameters,
+    real const * parameters,
+    real * function,
+    real * jacobian,
+    int ldfjac,
+    int iflag)
+{
+    real const * p = parameters;
+
+    real const pi = 3.14159;
+
+    real theta = 0.f;
+
+    if (p[0] > .0)
+        theta = .5 * atan(p[1] / p[0]) / pi;
+    else if (p[0] < 0.f)
+        theta = .5 * atan(p[1] / p[0]) / pi + .5f;
+
+    real const arg = p[0] * p[0] + p[1] * p[1];
+
+    if (iflag != 2)
+    {
+        function[0] = 10.0 * (p[2] - 10.0 * theta);
+        function[1] = 10.0 * (std::sqrt(arg) - 1.0);
+        function[2] = p[2];
+    }
+    else
+    {
+        // derivatives with respect to p[0]
+        jacobian[0 * size + 0] = 100.0 * 1.0 / (2.0*pi) * p[1] / arg;
+        jacobian[0 * size + 1] = 10.0 * p[0] / std::sqrt(arg);
+        jacobian[0 * size + 2] = 0.0;
+
+        // jacobian with respect to p[1]
+        jacobian[1 * size + 0] = -100.0 * 1.0 / (2.0*pi) * p[0] / (arg);
+        jacobian[1 * size + 1] = 10.0 * p[1] / std::sqrt(arg);
+        jacobian[1 * size + 2] = 0.0;
+
+        // jacobian with respect to p[2]
+        jacobian[2 * size + 0] = 10.0;
+        jacobian[2 * size + 1] = 0.0;
+        jacobian[2 * size + 2] = 1.0;
+    }
+
+    return 0;
+}
+
+int calculate_brown_dennis(
+    void * model,
+    int size,
+    int n_parameters,
+    real const * parameters,
+    real * function,
+    real * jacobian,
+    int ldfjac,
+    int iflag)
+{
+    real const * p = parameters;
+
+    for (int point_index = 0; point_index < size; point_index++)
+    {
+        real const t = static_cast<real>(point_index) / 5.0;
+
+        real const arg1 = p[0] + p[1] * t - std::exp(t);
+        real const arg2 = p[2] + p[3] * std::sin(t) - std::cos(t);
+
+        if (iflag != 2)
+        {
+            function[point_index] = arg1*arg1 + arg2*arg2;
+        }
+        else
+        {
+            real * current_jacobian = jacobian + point_index;
+
+            current_jacobian[0 * size] = 2.0 * arg1;
+            current_jacobian[1 * size] = 2.0 * t * arg1;
+            current_jacobian[2 * size] = 2.0 * arg2;
+            current_jacobian[3 * size] = 2.0 * std::sin(t) * arg2;
+        }
+    }
+    return 0;
+}
+
 void mexFunction(
     int          nlhs,
     mxArray      *plhs[],
     int          nrhs,
     mxArray const *prhs[])
 {
-    int expected_nrhs = 8;
+    int expected_nrhs = 9;
     int expected_nlhs = 3;
 
     bool wrong_nrhs = false;
@@ -215,6 +430,14 @@ void mexFunction(
             data_struct.data[ipixel] = real(data_ptr[ifit*data_struct.size + ipixel]);
         }
 
+        double const * x_data_ptr = mxGetPr(prhs[8]);
+        int const x_data_size = x_data_ptr ? data_struct.size : 0;
+        data_struct.x_data = new real[x_data_size];
+        for (int ipixel = 0; ipixel < x_data_size; ipixel++)
+        {
+            data_struct.x_data[ipixel] = real(x_data_ptr[ifit*data_struct.size + ipixel]);
+        }
+
         double const * start_values_ptr = (mxGetPr(prhs[5]));
         real * current_function_parameters = function_parameters + ifit*n_curve_parameters;
         real const * current_start_parameters = (real*)(start_values_ptr)+ifit*n_curve_parameters;
@@ -243,6 +466,66 @@ void mexFunction(
         case GAUSS_2D:
             info[ifit] = __cminpack_func__(lmder1)(
                 gauss2d,
+                &data_struct,
+                data_struct.size,
+                n_curve_parameters,
+                current_function_parameters,
+                calculated_function_values,
+                jacobian,
+                data_struct.size,
+                tolerance,
+                ipvt,
+                working_array,
+                working_array_size);
+            break;
+        case RAMSEY_FIXED_P:
+            info[ifit] = __cminpack_func__(lmder1)(
+                calculate_ramsey_fixed_p,
+                &data_struct,
+                data_struct.size,
+                n_curve_parameters,
+                current_function_parameters,
+                calculated_function_values,
+                jacobian,
+                data_struct.size,
+                tolerance,
+                ipvt,
+                working_array,
+                working_array_size);
+            break;
+        case RAMSEY_VAR_P:
+            info[ifit] = __cminpack_func__(lmder1)(
+                calculate_ramsey_var_p,
+                &data_struct,
+                data_struct.size,
+                n_curve_parameters,
+                current_function_parameters,
+                calculated_function_values,
+                jacobian,
+                data_struct.size,
+                tolerance,
+                ipvt,
+                working_array,
+                working_array_size);
+            break;
+        case FLETCHER_POWELL:
+            info[ifit] = __cminpack_func__(lmder1)(
+                calculate_fletcher_powell,
+                &data_struct,
+                data_struct.size,
+                n_curve_parameters,
+                current_function_parameters,
+                calculated_function_values,
+                jacobian,
+                data_struct.size,
+                tolerance,
+                ipvt,
+                working_array,
+                working_array_size);
+            break;
+        case BROWN_DENNIS:
+            info[ifit] = __cminpack_func__(lmder1)(
+                calculate_brown_dennis,
                 &data_struct,
                 data_struct.size,
                 n_curve_parameters,
