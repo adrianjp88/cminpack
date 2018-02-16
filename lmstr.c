@@ -387,7 +387,7 @@ int __cminpack_func__(lmstr)(__cminpack_decl_fcnderstr_mn__ void *p, int m, int 
 /*           determine the levenberg-marquardt parameter. */
 
             __cminpack_func__(lmpar)(n, fjac, ldfjac, ipvt, diag, qtf, delta,
-                  &par, wa1, wa2, wa3, wa4);
+                  &par, wa1, wa2, wa3, wa4, 0, 0, 0, 0);
 
 /*           store the direction p and x + p. calculate the norm of p. */
 

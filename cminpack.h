@@ -250,7 +250,7 @@ __cminpack_attr__
 int CMINPACK_EXPORT __cminpack_func__(lmder1)( __cminpack_decl_fcnder_mn__
 	       void *p, int m, int n, __cminpack_real__ *x, __cminpack_real__ *fvec, __cminpack_real__ *fjac,
 	       int ldfjac, __cminpack_real__ tol, int *ipvt,
-	       __cminpack_real__ *wa, int lwa );
+	       __cminpack_real__ *wa, int lwa , __cminpack_real__ * output_info);
 
 /* minimize the sum of the squares of nonlinear functions in N
    variables by a modification of the Levenberg-Marquardt algorithm
@@ -262,7 +262,7 @@ int CMINPACK_EXPORT __cminpack_func__(lmder)( __cminpack_decl_fcnder_mn__
 	      int maxfev, __cminpack_real__ *diag, int mode, __cminpack_real__ factor,
 	      int nprint, int *nfev, int *njev, int *ipvt,
 	      __cminpack_real__ *qtf, __cminpack_real__ *wa1, __cminpack_real__ *wa2, __cminpack_real__ *wa3,
-	      __cminpack_real__ *wa4 );
+	      __cminpack_real__ *wa4, __cminpack_real__ * output_info);
 
 /* minimize the sum of the squares of nonlinear functions in N
    variables by a modification of the Levenberg-Marquardt algorithm
@@ -354,10 +354,10 @@ __cminpack_attr__
 void __cminpack_func__(r1mpyq)(int m, int n, __cminpack_real__ *a, int
              lda, const __cminpack_real__ *v, const __cminpack_real__ *w);
 __cminpack_attr__
-void __cminpack_func__(lmpar)(int n, __cminpack_real__ *r, int ldr, 
+int __cminpack_func__(lmpar)(int n, __cminpack_real__ *r, int ldr, 
             const int *ipvt, const __cminpack_real__ *diag, const __cminpack_real__ *qtb, __cminpack_real__ delta, 
             __cminpack_real__ *par, __cminpack_real__ *x, __cminpack_real__ *sdiag, __cminpack_real__ *wa1, 
-            __cminpack_real__ *wa2);
+            __cminpack_real__ *wa2, __cminpack_real__ * output_lambda, __cminpack_real__ * output_lower_bound, __cminpack_real__ * output_upper_bound, __cminpack_real__ * output_phi);
 __cminpack_attr__
 void __cminpack_func__(rwupdt)(int n, __cminpack_real__ *r, int ldr, 
              const __cminpack_real__ *w, __cminpack_real__ *b, __cminpack_real__ *alpha, __cminpack_real__ *cos, 

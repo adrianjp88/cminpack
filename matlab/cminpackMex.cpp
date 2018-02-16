@@ -350,7 +350,7 @@ void mexFunction(
     mxArray const *prhs[])
 {
     int expected_nrhs = 9;
-    int expected_nlhs = 3;
+    int expected_nlhs = 4;
 
     bool wrong_nrhs = false;
     bool wrong_nlhs = false;
@@ -406,6 +406,7 @@ void mexFunction(
 
     int * info = new int[n_fits];
     int * iterations = new int[n_fits];
+    real * lambda_info;
 
     mxArray * mxCurveParameters;
     mxCurveParameters = mxCreateNumericMatrix(1, n_fits*n_curve_parameters, mxDOUBLE_CLASS, mxREAL);
@@ -421,6 +422,11 @@ void mexFunction(
     mxIterations = mxCreateNumericMatrix(1, n_fits, mxINT32_CLASS, mxREAL);
     iterations = (int*)mxGetData(mxIterations);
     plhs[2] = mxIterations;
+
+    mxArray * mxLambdaInfo;
+    mxLambdaInfo = mxCreateNumericMatrix(1, n_fits * 10 * 10000, mxDOUBLE_CLASS, mxREAL);
+    lambda_info = (real*)mxGetData(mxLambdaInfo);
+    plhs[3] = mxLambdaInfo;
 
     for (int ifit = 0; ifit < n_fits; ifit++)
     {
@@ -461,7 +467,8 @@ void mexFunction(
                 tolerance,
                 ipvt,
                 working_array,
-                working_array_size);
+                working_array_size,
+                lambda_info);
             break;
         case GAUSS_2D:
             info[ifit] = __cminpack_func__(lmder1)(
@@ -476,7 +483,8 @@ void mexFunction(
                 tolerance,
                 ipvt,
                 working_array,
-                working_array_size);
+                working_array_size,
+                lambda_info);
             break;
         case RAMSEY_FIXED_P:
             info[ifit] = __cminpack_func__(lmder1)(
@@ -491,7 +499,8 @@ void mexFunction(
                 tolerance,
                 ipvt,
                 working_array,
-                working_array_size);
+                working_array_size,
+                lambda_info);
             break;
         case RAMSEY_VAR_P:
             info[ifit] = __cminpack_func__(lmder1)(
@@ -506,7 +515,8 @@ void mexFunction(
                 tolerance,
                 ipvt,
                 working_array,
-                working_array_size);
+                working_array_size,
+                lambda_info);
             break;
         case FLETCHER_POWELL:
             info[ifit] = __cminpack_func__(lmder1)(
@@ -521,7 +531,8 @@ void mexFunction(
                 tolerance,
                 ipvt,
                 working_array,
-                working_array_size);
+                working_array_size,
+                lambda_info);
             break;
         case BROWN_DENNIS:
             info[ifit] = __cminpack_func__(lmder1)(
@@ -536,7 +547,8 @@ void mexFunction(
                 tolerance,
                 ipvt,
                 working_array,
-                working_array_size);
+                working_array_size,
+                lambda_info);
             break;
         default:
             break;

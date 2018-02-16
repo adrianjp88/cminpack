@@ -8,10 +8,10 @@
 #include "cminpackP.h"
 
 __cminpack_attr__
-void __cminpack_func__(lmpar)(int n, real *r, int ldr, 
+int __cminpack_func__(lmpar)(int n, real *r, int ldr, 
 	const int *ipvt, const real *diag, const real *qtb, real delta, 
 	real *par, real *x, real *sdiag, real *wa1, 
-	real *wa2)
+	real *wa2, real * output_lambda, real * output_lower_bound, real * output_upper_bound, real * output_phi)
 {
     /* Initialized data */
 
@@ -176,6 +176,9 @@ void __cminpack_func__(lmpar)(int n, real *r, int ldr,
     }
     dxnorm = __cminpack_enorm__(n, wa2);
     fp = dxnorm - delta;
+
+    output_phi[0] = fp;
+
     if (fp <= p1 * delta) {
 	goto TERMINATE;
     }
@@ -230,6 +233,9 @@ void __cminpack_func__(lmpar)(int n, real *r, int ldr,
         paru = dwarf / min(delta,(real)p1) /* / p001 ??? */;
     }
 
+    output_lower_bound[0] = parl;
+    output_upper_bound[0] = paru;
+
 /*     if the input par lies outside of the interval (parl,paru), */
 /*     set par to the closer endpoint. */
 
@@ -243,6 +249,8 @@ void __cminpack_func__(lmpar)(int n, real *r, int ldr,
 
     for (;;) {
         ++iter;
+
+        output_lambda[iter-1] = *par;
 
 /*        evaluate the function at the current value of par. */
 
@@ -262,6 +270,8 @@ void __cminpack_func__(lmpar)(int n, real *r, int ldr,
         dxnorm = __cminpack_enorm__(n, wa2);
         temp = fp;
         fp = dxnorm - delta;
+
+        output_phi[iter] = fp;
 
 /*        if the function is small enough, accept the current value */
 /*        of par. also test for the exceptional cases where parl */
@@ -304,6 +314,7 @@ void __cminpack_func__(lmpar)(int n, real *r, int ldr,
         }
 #     endif /* !USE_CBLAS */
         temp = __cminpack_enorm__(n, wa1);
+        real phi_der = delta * temp * temp;
         parc = fp / delta / temp / temp;
 
 /*        depending on the sign of the function, update parl or paru. */
@@ -315,11 +326,16 @@ void __cminpack_func__(lmpar)(int n, real *r, int ldr,
             paru = min(paru,*par);
         }
 
+        output_lower_bound[iter] = parl;
+        output_upper_bound[iter] = paru;
+
 /*        compute an improved estimate for par. */
 
         /* Computing MAX */
         d1 = parl, d2 = *par + parc;
         *par = max(d1,d2);
+
+        output_lambda[iter] = *par;
 
 /*        end of an iteration. */
 
@@ -330,7 +346,11 @@ TERMINATE:
 
     if (iter == 0) {
 	*par = 0.;
+
+    output_lambda[0] = *par;
     }
+
+    return iter;
 
 /*     last card of subroutine lmpar. */
 

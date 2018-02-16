@@ -1,4 +1,4 @@
-function [out,info, iteration_count, time]...
+function [out,info, iteration_count, time, lambda_info]...
     = cminpack(data, initial_parameters, functionID, tolerance, x_data)
 
 versionID = 6;
@@ -43,7 +43,7 @@ end
 
 %% run cminpack
 tic;
-[out, info, iteration_count]...
+[out, info, iteration_count, lambda_info]...
     = cminpackMex(versionID, data, fit_size, n_fits, n_parameters, initial_parameters, functionID, tolerance, x_data);
 time = toc;
 
