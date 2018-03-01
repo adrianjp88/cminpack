@@ -11,7 +11,10 @@ __cminpack_attr__
 int __cminpack_func__(lmpar)(int n, real *r, int ldr, 
 	const int *ipvt, const real *diag, const real *qtb, real delta, 
 	real *par, real *x, real *sdiag, real *wa1, 
-	real *wa2, real * output_lambda, real * output_lower_bound, real * output_upper_bound, real * output_phi)
+    real *wa2, int out_iter, real * output_lambda, real * output_lower_bound, real * output_upper_bound, real * output_step_bound,
+    real * output_actual_reduction, real * output_predicted_reduction, real * output_directive_derivative,
+    real * output_chi, real * output_phi, real * output_iteration
+    )
 {
     /* Initialized data */
 
@@ -177,7 +180,20 @@ int __cminpack_func__(lmpar)(int n, real *r, int ldr,
     dxnorm = __cminpack_enorm__(n, wa2);
     fp = dxnorm - delta;
 
-    output_phi[0] = fp;
+    int shift = 0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /**/ *(output_lambda++) = *par;                                             /**/
+    /**/ *(output_lower_bound++) = 0;                                           /**/
+    /**/ *(output_upper_bound++) = 0;                                           /**/
+    /**/ *(output_step_bound++) = delta;                                        /**/
+    /**/ *(output_actual_reduction++) = *(output_actual_reduction - 1);         /**/
+    /**/ *(output_predicted_reduction++) = *(output_predicted_reduction - 1);   /**/
+    /**/ *(output_directive_derivative++) = *(output_directive_derivative - 1); /**/
+    /**/ *(output_chi++) = *(output_chi - 1);                                   /**/
+    /**/ *(output_phi++) = fp;                                                  /**/
+    /**/ *(output_iteration++) = out_iter - 1;                                  /**/
+    /**/ shift++;                                                               /**/
+    ////////////////////////////////////////////////////////////////////////////////
 
     if (fp <= p1 * delta) {
 	goto TERMINATE;
@@ -186,7 +202,7 @@ int __cminpack_func__(lmpar)(int n, real *r, int ldr,
 /*     if the jacobian is not rank deficient, the newton */
 /*     step provides a lower bound, parl, for the zero of */
 /*     the function. otherwise set this bound to zero. */
-
+    real phider;
     parl = 0.;
     if (nsing >= n) {
         for (j = 0; j < n; ++j) {
@@ -208,6 +224,7 @@ int __cminpack_func__(lmpar)(int n, real *r, int ldr,
         }
 #     endif
         temp = __cminpack_enorm__(n, wa1);
+        phider = delta * temp * temp;
         parl = fp / delta / temp / temp;
     }
 
@@ -233,9 +250,6 @@ int __cminpack_func__(lmpar)(int n, real *r, int ldr,
         paru = dwarf / min(delta,(real)p1) /* / p001 ??? */;
     }
 
-    output_lower_bound[0] = parl;
-    output_upper_bound[0] = paru;
-
 /*     if the input par lies outside of the interval (parl,paru), */
 /*     set par to the closer endpoint. */
 
@@ -245,12 +259,24 @@ int __cminpack_func__(lmpar)(int n, real *r, int ldr,
         *par = gnorm / dxnorm;
     }
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /**/ *(output_lambda++) = *par;                                             /**/
+    /**/ *(output_lower_bound++) = parl;                                        /**/
+    /**/ *(output_upper_bound++) = paru;                                        /**/
+    /**/ *(output_step_bound++) = delta;                                        /**/
+    /**/ *(output_actual_reduction++) = *(output_actual_reduction - 1);         /**/
+    /**/ *(output_predicted_reduction++) = *(output_predicted_reduction - 1);   /**/
+    /**/ *(output_directive_derivative++) = *(output_directive_derivative - 1); /**/
+    /**/ *(output_chi++) = *(output_chi - 1);                                   /**/
+    /**/ *(output_phi++) = fp;                                                  /**/
+    /**/ *(output_iteration++) = out_iter - 1;                                  /**/
+    /**/ shift++;                                                               /**/
+    ////////////////////////////////////////////////////////////////////////////////
+
 /*     beginning of an iteration. */
 
     for (;;) {
         ++iter;
-
-        output_lambda[iter-1] = *par;
 
 /*        evaluate the function at the current value of par. */
 
@@ -271,7 +297,19 @@ int __cminpack_func__(lmpar)(int n, real *r, int ldr,
         temp = fp;
         fp = dxnorm - delta;
 
-        output_phi[iter] = fp;
+        ////////////////////////////////////////////////////////////////////////////////
+        /**/ *(output_lambda++) = *par;                                             /**/
+        /**/ *(output_lower_bound++) = parl;                                        /**/
+        /**/ *(output_upper_bound++) = paru;                                        /**/
+        /**/ *(output_step_bound++) = delta;                                        /**/
+        /**/ *(output_actual_reduction++) = *(output_actual_reduction - 1);         /**/
+        /**/ *(output_predicted_reduction++) = *(output_predicted_reduction - 1);   /**/
+        /**/ *(output_directive_derivative++) = *(output_directive_derivative - 1); /**/
+        /**/ *(output_chi++) = *(output_chi - 1);                                   /**/
+        /**/ *(output_phi++) = fp;                                                  /**/
+        /**/ *(output_iteration++) = out_iter - 1;                                  /**/
+        /**/ shift++;                                                               /**/
+        ////////////////////////////////////////////////////////////////////////////////
 
 /*        if the function is small enough, accept the current value */
 /*        of par. also test for the exceptional cases where parl */
@@ -314,7 +352,7 @@ int __cminpack_func__(lmpar)(int n, real *r, int ldr,
         }
 #     endif /* !USE_CBLAS */
         temp = __cminpack_enorm__(n, wa1);
-        real phi_der = delta * temp * temp;
+        phider = delta * temp * temp;
         parc = fp / delta / temp / temp;
 
 /*        depending on the sign of the function, update parl or paru. */
@@ -326,19 +364,27 @@ int __cminpack_func__(lmpar)(int n, real *r, int ldr,
             paru = min(paru,*par);
         }
 
-        output_lower_bound[iter] = parl;
-        output_upper_bound[iter] = paru;
-
 /*        compute an improved estimate for par. */
 
         /* Computing MAX */
         d1 = parl, d2 = *par + parc;
         *par = max(d1,d2);
 
-        output_lambda[iter] = *par;
+        ////////////////////////////////////////////////////////////////////////////////
+        /**/ *(output_lambda++) = *par;                                             /**/
+        /**/ *(output_lower_bound++) = parl;                                        /**/
+        /**/ *(output_upper_bound++) = paru;                                        /**/
+        /**/ *(output_step_bound++) = delta;                                        /**/
+        /**/ *(output_actual_reduction++) = *(output_actual_reduction - 1);         /**/
+        /**/ *(output_predicted_reduction++) = *(output_predicted_reduction - 1);   /**/
+        /**/ *(output_directive_derivative++) = *(output_directive_derivative - 1); /**/
+        /**/ *(output_chi++) = *(output_chi - 1);                                   /**/
+        /**/ *(output_phi++) = fp;                                                  /**/
+        /**/ *(output_iteration++) = out_iter - 1;                                  /**/
+        /**/ shift++;                                                               /**/
+        ////////////////////////////////////////////////////////////////////////////////
 
 /*        end of an iteration. */
-
     }
 TERMINATE:
 
@@ -347,10 +393,22 @@ TERMINATE:
     if (iter == 0) {
 	*par = 0.;
 
-    output_lambda[0] = *par;
+    ////////////////////////////////////////////////////////////////////////////////////
+    /**/ *(output_lambda++) = *par;                                                 /**/
+    /**/ *(output_lower_bound++) = *(output_lower_bound - 1);                       /**/
+    /**/ *(output_upper_bound++) = *(output_upper_bound - 1);                       /**/
+    /**/ *(output_step_bound++) = delta;                                            /**/
+    /**/ *(output_actual_reduction++) = *(output_actual_reduction - 1);             /**/
+    /**/ *(output_predicted_reduction++) = *(output_predicted_reduction - 1);       /**/
+    /**/ *(output_directive_derivative++) = *(output_directive_derivative - 1);     /**/
+    /**/ *(output_chi++) = *(output_chi - 1);                                       /**/
+    /**/ *(output_phi++) = fp;                                                      /**/
+    /**/ *(output_iteration++) = out_iter - 1;                                      /**/
+    /**/ shift++;                                                                   /**/
+    ////////////////////////////////////////////////////////////////////////////////////
     }
 
-    return iter;
+    return shift;
 
 /*     last card of subroutine lmpar. */
 

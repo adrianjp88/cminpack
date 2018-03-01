@@ -357,7 +357,13 @@ __cminpack_attr__
 int __cminpack_func__(lmpar)(int n, __cminpack_real__ *r, int ldr, 
             const int *ipvt, const __cminpack_real__ *diag, const __cminpack_real__ *qtb, __cminpack_real__ delta, 
             __cminpack_real__ *par, __cminpack_real__ *x, __cminpack_real__ *sdiag, __cminpack_real__ *wa1, 
-            __cminpack_real__ *wa2, __cminpack_real__ * output_lambda, __cminpack_real__ * output_lower_bound, __cminpack_real__ * output_upper_bound, __cminpack_real__ * output_phi);
+            __cminpack_real__ *wa2,
+            int iter,
+            __cminpack_real__ * output_lambda, __cminpack_real__ * output_lower_bound,
+            __cminpack_real__ * output_upper_bound, __cminpack_real__ * output_step_bound,
+            __cminpack_real__ * output_actual_reduction, __cminpack_real__ * output_predicted_reduction,
+            __cminpack_real__ * output_directive_derivative, __cminpack_real__ * output_chi,
+            __cminpack_real__ * output_phi, __cminpack_real__ * output_iteration);
 __cminpack_attr__
 void __cminpack_func__(rwupdt)(int n, __cminpack_real__ *r, int ldr, 
              const __cminpack_real__ *w, __cminpack_real__ *b, __cminpack_real__ *alpha, __cminpack_real__ *cos, 

@@ -24,6 +24,40 @@ typedef struct  {
     real * x_data;
 } fcndata_t;
 
+int gauss1d(void *p,
+    int size,
+    int n_parameters,
+    real const * parameters,
+    real * function,
+    real * jacobian,
+    int ldfjac,
+    int iflag)
+{
+    const real *data = ((fcndata_t*)p)->data;
+
+    for (int x = 0; x < size; x++)
+    {
+        real const arg
+            = ((x - parameters[1])*(x - parameters[1]))
+            / (2. * parameters[2] * parameters[2]);
+
+        real ex = exp(-arg);
+
+        if (iflag != 2)
+        {
+            function[x] = data[x] - (parameters[0] * ex + parameters[3]);
+        }
+        else
+        {
+            jacobian[x + size * 0] = -ex;
+            jacobian[x + size * 1] = -(parameters[0] * (x - parameters[1])*ex) / (parameters[2] * parameters[2]);
+            jacobian[x + size * 2] = -(parameters[0] * (x - parameters[1])*(x - parameters[1])*ex) / (parameters[2] * parameters[2] * parameters[2]);
+            jacobian[x + size * 3] = -1.;
+        }
+    }
+    return 0;
+}
+
 int gauss2d_elliptic(void *p,
     int size,
     int n_parameters,
@@ -226,8 +260,8 @@ int calculate_ramsey_var_p(
         real const pi = 3.14159;
         real const t2arg = pow(x / p[6], p[5]);
         real const ex = exp(-t2arg);
-        real const phasearg1 = 2 * pi*p[3] * (x - p[7]);
-        real const phasearg2 = 2 * pi*p[4] * (x - p[8]);
+        real const phasearg1 = 2. * pi*p[3] * (x - p[7]);
+        real const phasearg2 = 2. * pi*p[4] * (x - p[8]);
         real const cos1 = cos(phasearg1);
         real const sin1 = sin(phasearg1);
         real const cos2 = cos(phasearg2);
@@ -245,13 +279,13 @@ int calculate_ramsey_var_p(
             real * current_jacobian = jacobian + i;
             current_jacobian[0 * size] = ex*cos1;
             current_jacobian[1 * size] = ex*cos2;
-            current_jacobian[2 * size] = 1.f;
-            current_jacobian[3 * size] = -p[0] * 2 * pi*(x - p[7])*ex*sin1;
-            current_jacobian[4 * size] = -p[1] * 2 * pi*(x - p[8])*ex*sin2;
+            current_jacobian[2 * size] = 1.;
+            current_jacobian[3 * size] = -p[0] * 2. * pi*(x - p[7])*ex*sin1;
+            current_jacobian[4 * size] = -p[1] * 2. * pi*(x - p[8])*ex*sin2;
             current_jacobian[5 * size] = -log(x / p[6] + 0.000001)*ex*t2arg*(p[0] * cos1 + p[1] * cos2);
-            current_jacobian[6 * size] = p[5] * 1.f / (p[6] * p[6])*x*ex*pow(x / p[6], p[5] - 1)*(p[0] * cos1 + p[1] * cos2);
-            current_jacobian[7 * size] = p[0] * 2 * pi*p[3] * sin1*ex;
-            current_jacobian[8 * size] = p[1] * 2 * pi*p[4] * sin2*ex;
+            current_jacobian[6 * size] = p[5] * 1. / (p[6] * p[6])*x*ex*pow(x / p[6], p[5] - 1.)*(p[0] * cos1 + p[1] * cos2);
+            current_jacobian[7 * size] = p[0] * 2. * pi*p[3] * sin1*ex;
+            current_jacobian[8 * size] = p[1] * 2. * pi*p[4] * sin2*ex;
         }
     }
     return 0;
@@ -454,6 +488,22 @@ void mexFunction(
 
         switch (functionID)
         {
+        case GAUSS_1D:
+            info[ifit] = __cminpack_func__(lmder1)(
+                gauss1d,
+                &data_struct,
+                data_struct.size,
+                n_curve_parameters,
+                current_function_parameters,
+                calculated_function_values,
+                jacobian,
+                data_struct.size,
+                tolerance,
+                ipvt,
+                working_array,
+                working_array_size,
+                lambda_info);
+            break;
         case GAUSS_2D_ELLIPTIC:
             info[ifit] = __cminpack_func__(lmder1)(
                 gauss2d_elliptic,

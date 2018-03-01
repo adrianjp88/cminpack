@@ -222,7 +222,7 @@ int __cminpack_func__(lmder)(__cminpack_decl_fcnder_mn__ void *p, int m, int n, 
     real * output_directive_derivative = lambda_info + 6000;
     real * output_phi = lambda_info + 7000;
     real * output_chi = lambda_info + 8000;
-    real * output_previous_chi = lambda_info + 9000;
+    real * output_iteration = lambda_info + 9000;
 
     epsmch = __cminpack_func__(dpmpar)(1);
 
@@ -255,7 +255,18 @@ int __cminpack_func__(lmder)(__cminpack_decl_fcnder_mn__ void *p, int m, int n, 
     }
     fnorm = __cminpack_enorm__(m, fvec);
 
-    *(output_chi++) = fnorm;
+    ////////////////////////////////////////////////////////////////////
+    /**/ *(output_lambda++) = 0;                                    /**/
+    /**/ *(output_lower_bound++) = 0;                               /**/
+    /**/ *(output_upper_bound++) = 0;                               /**/
+    /**/ *(output_step_bound++) = delta;                            /**/
+    /**/ *(output_actual_reduction++) = 0;                          /**/
+    /**/ *(output_predicted_reduction++) =  0;                      /**/
+    /**/ *(output_directive_derivative++) = 0;                      /**/
+    /**/ *(output_chi++) = fnorm;                                   /**/
+    /**/ *(output_phi++) = 0;                                       /**/
+    /**/ *(output_iteration++) = -1;                                /**/
+    ////////////////////////////////////////////////////////////////////
 
 /*     initialize levenberg-marquardt parameter and iteration counter. */
 
@@ -315,7 +326,18 @@ int __cminpack_func__(lmder)(__cminpack_decl_fcnder_mn__ void *p, int m, int n, 
             if (delta == 0.) {
                 delta = factor;
             }
-            *(output_step_bound++) = delta;
+            ////////////////////////////////////////////////////////////////////
+            /**/ *(output_lambda++) = par;                                  /**/
+            /**/ *(output_lower_bound++) = *(output_lower_bound - 1);       /**/
+            /**/ *(output_upper_bound++) = *(output_upper_bound - 1);       /**/
+            /**/ *(output_step_bound++) = delta;                            /**/
+            /**/ *(output_actual_reduction++) = 0;                          /**/
+            /**/ *(output_predicted_reduction++) = 0;                       /**/
+            /**/ *(output_directive_derivative++) = 0;                      /**/
+            /**/ *(output_chi++) = fnorm;                                   /**/
+            /**/ *(output_phi++) = *(output_phi - 1);                       /**/
+            /**/ *(output_iteration++) = iter-1;                            /**/
+            ////////////////////////////////////////////////////////////////////
         }
 
 /*        form (q transpose)*fvec and store the first n components in */
@@ -383,12 +405,22 @@ int __cminpack_func__(lmder)(__cminpack_decl_fcnder_mn__ void *p, int m, int n, 
 /*           determine the levenberg-marquardt parameter. */
 
             int shift = __cminpack_func__(lmpar)(n, fjac, ldfjac, ipvt, diag, qtf, delta,
-                  &par, wa1, wa2, wa3, wa4, output_lambda, output_lower_bound, output_upper_bound, output_phi);
+                &par, wa1, wa2, wa3, wa4, iter, output_lambda, output_lower_bound, output_upper_bound, output_step_bound,
+                output_actual_reduction, output_predicted_reduction, output_directive_derivative,
+                output_chi, output_phi, output_iteration);
 
-            output_phi += 1 + shift;
-            output_lambda = shift == 0 ? output_lambda + 1 : output_lambda + shift;
-            output_lower_bound += shift;
-            output_upper_bound += shift;
+            ////////////////////////////////////////////////
+            /**/ output_lambda += shift;                /**/
+            /**/ output_lower_bound += shift;           /**/
+            /**/ output_upper_bound += shift;           /**/
+            /**/ output_step_bound += shift;            /**/
+            /**/ output_actual_reduction += shift;      /**/
+            /**/ output_predicted_reduction += shift;   /**/
+            /**/ output_directive_derivative += shift;  /**/
+            /**/ output_chi += shift;                   /**/
+            /**/ output_phi += shift;                   /**/
+            /**/ output_iteration += shift;             /**/
+            ////////////////////////////////////////////////
 
 /*           store the direction p and x + p. calculate the norm of p. */
 
@@ -404,7 +436,18 @@ int __cminpack_func__(lmder)(__cminpack_decl_fcnder_mn__ void *p, int m, int n, 
             if (iter == 1) {
                 delta = min(delta,pnorm);
 
-                *(output_step_bound++) = delta;
+                ////////////////////////////////////////////////////////////////////////////
+                /**/ *(output_lambda++) = par;                                          /**/
+                /**/ *(output_lower_bound++) = *(output_lower_bound - 1);               /**/
+                /**/ *(output_upper_bound++) = *(output_upper_bound - 1);               /**/
+                /**/ *(output_step_bound++) = delta;                                    /**/
+                /**/ *(output_actual_reduction++) = *(output_actual_reduction - 1);             /**/
+                /**/ *(output_predicted_reduction++) = *(output_predicted_reduction - 1);       /**/
+                /**/ *(output_directive_derivative++) = *(output_directive_derivative - 1);     /**/
+                /**/ *(output_chi++) = fnorm;                                           /**/
+                /**/ *(output_phi++) = *(output_phi - 1);                               /**/
+                /**/ *(output_iteration++) = iter-1;                                    /**/
+                ////////////////////////////////////////////////////////////////////////////
             }
 
 /*           evaluate the function at x + p and calculate its norm. */
@@ -416,7 +459,18 @@ int __cminpack_func__(lmder)(__cminpack_decl_fcnder_mn__ void *p, int m, int n, 
             }
             fnorm1 = __cminpack_enorm__(m, wa4);
 
-            *(output_chi++) = fnorm1;
+            ////////////////////////////////////////////////////////////////////////////
+            /**/ *(output_lambda++) = par;                                          /**/
+            /**/ *(output_lower_bound++) = *(output_lower_bound - 1);               /**/
+            /**/ *(output_upper_bound++) = *(output_upper_bound - 1);               /**/
+            /**/ *(output_step_bound++) = delta;                                    /**/
+            /**/ *(output_actual_reduction++) = *(output_actual_reduction - 1);             /**/
+            /**/ *(output_predicted_reduction++) = *(output_predicted_reduction - 1);       /**/
+            /**/ *(output_directive_derivative++) = *(output_directive_derivative - 1);     /**/
+            /**/ *(output_chi++) = fnorm1;                                          /**/
+            /**/ *(output_phi++) = *(output_phi - 1);                               /**/
+            /**/ *(output_iteration++) = iter-1;                                    /**/
+            ////////////////////////////////////////////////////////////////////////////
 
 /*           compute the scaled actual reduction. */
 
@@ -473,11 +527,18 @@ int __cminpack_func__(lmder)(__cminpack_decl_fcnder_mn__ void *p, int m, int n, 
                 }
             }
 
-            *(output_actual_reduction++) = actred;
-            *(output_predicted_reduction++) = prered;
-            *(output_directive_derivative++) = dirder;
-            *(output_step_bound++) = delta;
-            *(output_lambda++) = par;
+            ////////////////////////////////////////////////////////////////////
+            /**/ *(output_lambda++) = par;                                  /**/
+            /**/ *(output_lower_bound++) = *(output_lower_bound - 1);       /**/
+            /**/ *(output_upper_bound++) = *(output_upper_bound - 1);       /**/
+            /**/ *(output_step_bound++) = delta;                            /**/
+            /**/ *(output_actual_reduction++) = actred;                     /**/
+            /**/ *(output_predicted_reduction++) = prered;                  /**/
+            /**/ *(output_directive_derivative++) = dirder;                 /**/
+            /**/ *(output_chi++) = fnorm1;                                  /**/
+            /**/ *(output_phi++) = *(output_phi - 1);                       /**/
+            /**/ *(output_iteration++) = iter-1;                            /**/
+            ////////////////////////////////////////////////////////////////////
 
 /*           test for successful iteration. */
 
@@ -498,7 +559,18 @@ int __cminpack_func__(lmder)(__cminpack_decl_fcnder_mn__ void *p, int m, int n, 
             }
             ++iter;
 
-            *(output_chi++) = fnorm;
+            ////////////////////////////////////////////////////////////////////
+            /**/ *(output_lambda++) = par;                                  /**/
+            /**/ *(output_lower_bound++) = *(output_lower_bound - 1);       /**/
+            /**/ *(output_upper_bound++) = *(output_upper_bound - 1);       /**/
+            /**/ *(output_step_bound++) = delta;                            /**/
+            /**/ *(output_actual_reduction++) = actred;                     /**/
+            /**/ *(output_predicted_reduction++) = prered;                  /**/
+            /**/ *(output_directive_derivative++) = dirder;                 /**/
+            /**/ *(output_chi++) = fnorm;                                   /**/
+            /**/ *(output_phi++) = *(output_phi - 1);                       /**/
+            /**/ *(output_iteration++) = iter-2;                            /**/
+            ////////////////////////////////////////////////////////////////////
 /*           tests for convergence. */
 
             if (fabs(actred) <= ftol && prered <= ftol && p5 * ratio <= 1.) {
