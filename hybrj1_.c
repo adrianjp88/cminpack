@@ -59,7 +59,7 @@ void __minpack_func__(hybrj1)(__minpack_decl_fcnder_nn__ const int *n, real *x, 
 /*         end */
 
 /*         the value of iflag should not be changed by fcn unless */
-/*         the user wants to terminate execution of hybrj1. */
+/*         the user wants to terminate execution of hybrj1.f */
 /*         in this case set iflag to a negative integer. */
 
 /*       n is a positive integer input variable set to the number */
@@ -129,7 +129,7 @@ void __minpack_func__(hybrj1)(__minpack_decl_fcnder_nn__ const int *n, real *x, 
 
 /*     check the input parameters for errors. */
 
-    if (*n <= 0 || *ldfjac < *n || *tol < 0. || *lwa < *n * (*n + 13) / 2) {
+    if (*n <= 0 || *ldfjac < *n || *tol < 0.f || *lwa < *n * (*n + 13) / 2) {
 	/* goto L20; */
         return;
     }
@@ -141,7 +141,7 @@ void __minpack_func__(hybrj1)(__minpack_decl_fcnder_nn__ const int *n, real *x, 
     mode = 2;
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	wa[j] = 1.;
+	wa[j] = 1.f;
 /* L10: */
     }
     nprint = 0;
@@ -156,7 +156,7 @@ void __minpack_func__(hybrj1)(__minpack_decl_fcnder_nn__ const int *n, real *x, 
 /* L20: */
     return;
 
-/*     last card of subroutine hybrj1. */
+/*     last card of subroutine hybrj1.f */
 
 } /* hybrj1_ */
 

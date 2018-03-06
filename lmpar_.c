@@ -24,8 +24,8 @@ void __minpack_func__(lmpar)(const int *n, real *r__, const int *ldr,
 
     /* Initialized data */
 
-#define p1 .1
-#define p001 .001
+#define p1 .1f
+#define p001 .001f
 
     /* System generated locals */
     int r_dim1, r_offset, i__1, i__2;
@@ -51,7 +51,7 @@ void __minpack_func__(lmpar)(const int *n, real *r__, const int *ldr,
 /*     the problem is to determine a value for the parameter */
 /*     par such that if x solves the system */
 
-/*           a*x = b ,     sqrt(par)*d*x = 0 , */
+/*           a*x = b ,     sqrtf(par)*d*x = 0 , */
 
 /*     in the least squares sense, and dxnorm is the euclidean */
 /*     norm of d*x, then either par is zero and */
@@ -118,7 +118,7 @@ void __minpack_func__(lmpar)(const int *n, real *r__, const int *ldr,
 /*         on output par contains the final estimate. */
 
 /*       x is an output array of length n which contains the least */
-/*         squares solution of the system a*x = b, sqrt(par)*d*x = 0, */
+/*         squares solution of the system a*x = b, sqrtf(par)*d*x = 0, */
 /*         for the output par. */
 
 /*       sdiag is an output array of length n which contains the */
@@ -130,7 +130,7 @@ void __minpack_func__(lmpar)(const int *n, real *r__, const int *ldr,
 
 /*       minpack-supplied ... dpmpar,enorm,qrsolv */
 
-/*       fortran-supplied ... dabs,dmax1,dmin1,dsqrt */
+/*       fortran-supplied ... dabs,dmax1,dmin1,dsqrtf */
 
 /*     argonne national laboratory. minpack project. march 1980. */
 /*     burton s. garbow, kenneth e. hillstrom, jorge j. more */
@@ -161,11 +161,11 @@ void __minpack_func__(lmpar)(const int *n, real *r__, const int *ldr,
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
 	wa1[j] = qtb[j];
-	if (r__[j + j * r_dim1] == 0. && nsing == *n) {
+	if (r__[j + j * r_dim1] == 0.f && nsing == *n) {
 	    nsing = j - 1;
 	}
 	if (nsing < *n) {
-	    wa1[j] = 0.;
+	    wa1[j] = 0.f;
 	}
 /* L10: */
     }
@@ -218,7 +218,7 @@ L50:
 /*     step provides a lower bound, parl, for the zero of */
 /*     the function. otherwise set this bound to zero. */
 
-    parl = 0.;
+    parl = 0.f;
     if (nsing < *n) {
 	goto L120;
     }
@@ -230,7 +230,7 @@ L50:
     }
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	sum = 0.;
+	sum = 0.f;
 	jm1 = j - 1;
 	if (jm1 < 1) {
 	    goto L100;
@@ -252,7 +252,7 @@ L120:
 
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	sum = 0.;
+	sum = 0.f;
 	i__2 = j;
 	for (i__ = 1; i__ <= i__2; ++i__) {
 	    sum += r__[i__ + j * r_dim1] * qtb[i__];
@@ -264,7 +264,7 @@ L120:
     }
     gnorm = __minpack_func__(enorm)(n, &wa1[1]);
     paru = gnorm / *delta;
-    if (paru == 0.) {
+    if (paru == 0.f) {
 	paru = dwarf / min(*delta,(real)p1);
     }
 
@@ -273,7 +273,7 @@ L120:
 
     *par = max(*par,parl);
     *par = min(*par,paru);
-    if (*par == 0.) {
+    if (*par == 0.f) {
 	*par = gnorm / dxnorm;
     }
 
@@ -284,12 +284,12 @@ L150:
 
 /*        evaluate the function at the current value of par. */
 
-    if (*par == 0.) {
+    if (*par == 0.f) {
 /* Computing MAX */
 	d__1 = dwarf, d__2 = p001 * paru;
 	*par = max(d__1,d__2);
     }
-    temp = sqrt(*par);
+    temp = sqrtf(*par);
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
 	wa1[j] = temp * diag[j];
@@ -310,7 +310,7 @@ L150:
 /*        of par. also test for the exceptional cases where parl */
 /*        is zero or the number of iterations has reached 10. */
 
-    if (abs(fp) <= p1 * *delta || (parl == 0. && fp <= temp && temp < 0.) ||
+    if (abs(fp) <= p1 * *delta || (parl == 0.f && fp <= temp && temp < 0.f) ||
 	     iter == 10) {
 	goto L220;
     }
@@ -345,10 +345,10 @@ L200:
 
 /*        depending on the sign of the function, update parl or paru. */
 
-    if (fp > 0.) {
+    if (fp > 0.f) {
 	parl = max(parl,*par);
     }
-    if (fp < 0.) {
+    if (fp < 0.f) {
 	paru = min(paru,*par);
     }
 
@@ -366,7 +366,7 @@ L220:
 /*     termination. */
 
     if (iter == 0) {
-	*par = 0.;
+	*par = 0.f;
     }
     return;
 

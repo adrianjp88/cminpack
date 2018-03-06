@@ -7,8 +7,8 @@
 #include <math.h>
 #define real __minpack_real__
 
-#define log10e 0.43429448190325182765
-#define factor 100.
+#define log10e 0.43429448190325182765f
+#define factor 100.f
 
 /* Table of constant values */
 
@@ -38,7 +38,7 @@ void __minpack_func__(chkder)(const int *m, const int *n, const real *x,
 /*     the functions themselves. the user must call chkder twice, */
 /*     first with mode = 1 and then with mode = 2. */
 
-/*     mode = 1. on input, x must contain the point of evaluation. */
+/*     mode = 1.f on input, x must contain the point of evaluation. */
 /*               on output, xp is set to a neighboring point. */
 
 /*     mode = 2. on input, fvec must contain the functions and the */
@@ -87,7 +87,7 @@ void __minpack_func__(chkder)(const int *m, const int *n, const real *x,
 
 /*       mode is an integer input variable set to 1 on the first call */
 /*         and 2 on the second. other values of mode are equivalent */
-/*         to mode = 1. */
+/*         to mode = 1.f */
 
 /*       err is an array of length m. on output when mode = 2, */
 /*         err contains measures of correctness of the respective */
@@ -104,7 +104,7 @@ void __minpack_func__(chkder)(const int *m, const int *n, const real *x,
 
 /*       minpack supplied ... dpmpar */
 
-/*       fortran supplied ... dabs,dlog10,dsqrt */
+/*       fortran supplied ... dabs,dlog10,dsqrtf */
 
 /*     argonne national laboratory. minpack project. march 1980. */
 /*     burton s. garbow, kenneth e. hillstrom, jorge j. more */
@@ -126,18 +126,18 @@ void __minpack_func__(chkder)(const int *m, const int *n, const real *x,
 
     epsmch = __minpack_func__(dpmpar)(&c__1);
 
-    eps = sqrt(epsmch);
+    eps = sqrtf(epsmch);
 
     if (*mode == 2) {
 	goto L20;
     }
 
-/*        mode = 1. */
+/*        mode = 1.f */
 
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	temp = eps * fabs(x[j]);
-	if (temp == 0.) {
+	temp = eps * fabsf(x[j]);
+	if (temp == 0.f) {
 	    temp = eps;
 	}
 	xp[j] = x[j] + temp;
@@ -150,17 +150,17 @@ L20:
 /*        mode = 2. */
 
     epsf = factor * epsmch;
-    epslog = log10e * log(eps);
+    epslog = log10e * logf(eps);
     i__1 = *m;
     for (i__ = 1; i__ <= i__1; ++i__) {
-	err[i__] = 0.;
+	err[i__] = 0.f;
 /* L30: */
     }
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	temp = fabs(x[j]);
-	if (temp == 0.) {
-	    temp = 1.;
+	temp = fabsf(x[j]);
+	if (temp == 0.f) {
+	    temp = 1.f;
 	}
 	i__2 = *m;
 	for (i__ = 1; i__ <= i__2; ++i__) {
@@ -171,20 +171,20 @@ L20:
     }
     i__1 = *m;
     for (i__ = 1; i__ <= i__1; ++i__) {
-	temp = 1.;
-	if (fvec[i__] != 0. && fvecp[i__] != 0. && fabs(fvecp[i__] - 
-		fvec[i__]) >= epsf * fabs(fvec[i__]))
+	temp = 1.f;
+	if (fvec[i__] != 0.f && fvecp[i__] != 0.f && fabsf(fvecp[i__] - 
+		fvec[i__]) >= epsf * fabsf(fvec[i__]))
 		 {
-	    temp = eps * fabs((fvecp[i__] - fvec[i__]) / eps - err[i__]) 
-		    / (fabs(fvec[i__]) +
-                       fabs(fvecp[i__]));
+	    temp = eps * fabsf((fvecp[i__] - fvec[i__]) / eps - err[i__]) 
+		    / (fabsf(fvec[i__]) +
+                       fabsf(fvecp[i__]));
 	}
-	err[i__] = 1.;
+	err[i__] = 1.f;
 	if (temp > epsmch && temp < eps) {
-	    err[i__] = (log10e * log(temp) - epslog) / epslog;
+	    err[i__] = (log10e * logf(temp) - epslog) / epslog;
 	}
 	if (temp >= eps) {
-	    err[i__] = 0.;
+	    err[i__] = 0.f;
 	}
 /* L60: */
     }

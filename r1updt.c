@@ -13,8 +13,8 @@ void __cminpack_func__(r1updt)(int m, int n, real *s, int
 {
     /* Initialized data */
 
-#define p5 .5
-#define p25 .25
+#define p5 .5f
+#define p25 .25f
 
     /* Local variables */
     int i, j, l, jj, nm1;
@@ -83,7 +83,7 @@ void __cminpack_func__(r1updt)(int m, int n, real *s, int
 
 /*       minpack-supplied ... dpmpar */
 
-/*       fortran-supplied ... dabs,dsqrt */
+/*       fortran-supplied ... dabs,dsqrtf */
 
 /*     argonne national laboratory. minpack project. march 1980. */
 /*     burton s. garbow, kenneth e. hillstrom, jorge j. more, */
@@ -123,23 +123,23 @@ void __cminpack_func__(r1updt)(int m, int n, real *s, int
         for (nmj = 1; nmj <= nm1; ++nmj) {
             j = n - nmj;
             jj -= m - j + 1;
-            w[j] = 0.;
-            if (v[j] != 0.) {
+            w[j] = 0.f;
+            if (v[j] != 0.f) {
 
 /*        determine a givens rotation which eliminates the */
 /*        j-th element of v. */
 
-                if (fabs(v[n]) < fabs(v[j])) {
+                if (fabsf(v[n]) < fabsf(v[j])) {
                     cotan = v[n] / v[j];
-                    sin = p5 / sqrt(p25 + p25 * (cotan * cotan));
+                    sin = p5 / sqrtf(p25 + p25 * (cotan * cotan));
                     cos = sin * cotan;
-                    tau = 1.;
-                    if (fabs(cos) * giant > 1.) {
-                        tau = 1. / cos;
+                    tau = 1.f;
+                    if (fabsf(cos) * giant > 1.f) {
+                        tau = 1.f / cos;
                     }
                 } else {
                     tan = v[j] / v[n];
-                    cos = p5 / sqrt(p25 + p25 * (tan * tan));
+                    cos = p5 / sqrtf(p25 + p25 * (tan * tan));
                     sin = cos * tan;
                     tau = sin;
                 }
@@ -174,22 +174,22 @@ void __cminpack_func__(r1updt)(int m, int n, real *s, int
     *sing = FALSE_;
     if (nm1 >= 1) {
         for (j = 1; j <= nm1; ++j) {
-            if (w[j] != 0.) {
+            if (w[j] != 0.f) {
 
 /*        determine a givens rotation which eliminates the */
 /*        j-th element of the spike. */
 
-                if (fabs(s[jj]) < fabs(w[j])) {
+                if (fabsf(s[jj]) < fabsf(w[j])) {
                     cotan = s[jj] / w[j];
-                    sin = p5 / sqrt(p25 + p25 * (cotan * cotan));
+                    sin = p5 / sqrtf(p25 + p25 * (cotan * cotan));
                     cos = sin * cotan;
-                    tau = 1.;
-                    if (fabs(cos) * giant > 1.) {
-                        tau = 1. / cos;
+                    tau = 1.f;
+                    if (fabsf(cos) * giant > 1.f) {
+                        tau = 1.f / cos;
                     }
                 } else {
                     tan = w[j] / s[jj];
-                    cos = p5 / sqrt(p25 + p25 * (tan * tan));
+                    cos = p5 / sqrtf(p25 + p25 * (tan * tan));
                     sin = cos * tan;
                     tau = sin;
                 }
@@ -212,7 +212,7 @@ void __cminpack_func__(r1updt)(int m, int n, real *s, int
 
 /*        test for zero diagonal elements in the output s. */
 
-            if (s[jj] == 0.) {
+            if (s[jj] == 0.f) {
                 *sing = TRUE_;
             }
             jj += m - j + 1;
@@ -226,7 +226,7 @@ void __cminpack_func__(r1updt)(int m, int n, real *s, int
 	s[l] = w[i];
 	++l;
     }
-    if (s[jj] == 0.) {
+    if (s[jj] == 0.f) {
 	*sing = TRUE_;
     }
 

@@ -33,12 +33,20 @@ else
     n_fits = 1;
 end
 
-if ~isa(data, 'double')
-    data = cast(data,'double');
+if ~isa(data, 'single')
+    data = cast(data,'single');
 end
 
-if ~isa(initial_parameters, 'double')
-    initial_parameters = cast(initial_parameters,'double');
+if ~isa(x_data, 'single')
+    x_data = cast(x_data,'single');
+end
+
+if ~isa(tolerance, 'single')
+    tolerance = cast(tolerance,'single');
+end
+
+if ~isa(initial_parameters, 'single')
+    initial_parameters = cast(initial_parameters,'single');
 end
 
 %% run cminpack

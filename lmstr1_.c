@@ -60,7 +60,7 @@ void __minpack_func__(lmstr1)(__minpack_decl_fcnderstr_mn__  const int *m, const
 /*         end */
 
 /*         the value of iflag should not be changed by fcn unless */
-/*         the user wants to terminate execution of lmstr1. */
+/*         the user wants to terminate execution of lmstr1.f */
 /*         in this case set iflag to a negative integer. */
 
 /*       m is a positive integer input variable set to the number */
@@ -159,7 +159,7 @@ void __minpack_func__(lmstr1)(__minpack_decl_fcnderstr_mn__  const int *m, const
 
 /*     check the input parameters for errors. */
 
-    if (*n <= 0 || *m < *n || *ldfjac < *n || *tol < 0. || *lwa < *n * 5 + *
+    if (*n <= 0 || *m < *n || *ldfjac < *n || *tol < 0.f || *lwa < *n * 5 + *
 	    m) {
 	/* goto L10; */
         return;
@@ -170,7 +170,7 @@ void __minpack_func__(lmstr1)(__minpack_decl_fcnderstr_mn__  const int *m, const
     maxfev = (*n + 1) * 100;
     ftol = *tol;
     xtol = *tol;
-    gtol = 0.;
+    gtol = 0.f;
     mode = 1;
     nprint = 0;
     __minpack_func__(lmstr)(__minpack_param_fcnderstr_mn__ m, n, &x[1], &fvec[1], &fjac[fjac_offset], ldfjac, &
@@ -183,7 +183,7 @@ void __minpack_func__(lmstr1)(__minpack_decl_fcnderstr_mn__  const int *m, const
 /* L10: */
     return;
 
-/*     last card of subroutine lmstr1. */
+/*     last card of subroutine lmstr1.f */
 
 } /* lmstr1_ */
 

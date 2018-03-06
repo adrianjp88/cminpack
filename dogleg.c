@@ -74,7 +74,7 @@ void __cminpack_func__(dogleg)(int n, const real *r, int lr,
 
 /*       minpack-supplied ... dpmpar,enorm */
 
-/*       fortran-supplied ... dabs,dmax1,dmin1,dsqrt */
+/*       fortran-supplied ... dabs,dmax1,dmin1,dsqrtf */
 
 /*     argonne national laboratory. minpack project. march 1980. */
 /*     burton s. garbow, kenneth e. hillstrom, jorge j. more */
@@ -103,7 +103,7 @@ void __cminpack_func__(dogleg)(int n, const real *r, int lr,
 	jp1 = j + 1;
 	jj -= k;
 	l = jj + 1;
-	sum = 0.;
+	sum = 0.f;
 	if (n >= jp1) {
             for (i = jp1; i <= n; ++i) {
                 sum += r[l] * x[i];
@@ -111,16 +111,16 @@ void __cminpack_func__(dogleg)(int n, const real *r, int lr,
             }
         }
 	temp = r[jj];
-	if (temp == 0.) {
+	if (temp == 0.f) {
             l = j;
             for (i = 1; i <= j; ++i) {
                 /* Computing MAX */
-                d2 = fabs(r[l]);
+                d2 = fabsf(r[l]);
                 temp = max(temp,d2);
                 l = l + n - i;
             }
             temp = epsmch * temp;
-            if (temp == 0.) {
+            if (temp == 0.f) {
                 temp = epsmch;
             }
         }
@@ -130,7 +130,7 @@ void __cminpack_func__(dogleg)(int n, const real *r, int lr,
 /*     test whether the gauss-newton direction is acceptable. */
 
     for (j = 1; j <= n; ++j) {
-	wa1[j] = 0.;
+	wa1[j] = 0.f;
 	wa2[j] = diag[j] * x[j];
     }
     qnorm = __cminpack_enorm__(n, &wa2[1]);
@@ -155,9 +155,9 @@ void __cminpack_func__(dogleg)(int n, const real *r, int lr,
 /*     the special case in which the scaled gradient is zero. */
 
     gnorm = __cminpack_enorm__(n, &wa1[1]);
-    sgnorm = 0.;
+    sgnorm = 0.f;
     alpha = delta / qnorm;
-    if (gnorm != 0.) {
+    if (gnorm != 0.f) {
 
 /*     calculate the point along the scaled gradient */
 /*     at which the quadratic is minimized. */
@@ -167,7 +167,7 @@ void __cminpack_func__(dogleg)(int n, const real *r, int lr,
         }
         l = 1;
         for (j = 1; j <= n; ++j) {
-            sum = 0.;
+            sum = 0.f;
             for (i = j; i <= n; ++i) {
                 sum += r[l] * wa1[i];
                 ++l;
@@ -179,7 +179,7 @@ void __cminpack_func__(dogleg)(int n, const real *r, int lr,
 
 /*     test whether the scaled gradient direction is acceptable. */
 
-        alpha = 0.;
+        alpha = 0.f;
         if (sgnorm < delta) {
 
 /*     the scaled gradient direction is not acceptable. */
@@ -197,18 +197,18 @@ void __cminpack_func__(dogleg)(int n, const real *r, int lr,
             /* Computing 2nd power */
             d4 = sgnorm / delta;
             temp = temp - delta / qnorm * (d1 * d1)
-                   + sqrt(d2 * d2
-                          + (1. - d3 * d3) * (1. - d4 * d4));
+                   + sqrtf(d2 * d2
+                          + (1.f - d3 * d3) * (1.f - d4 * d4));
             /* Computing 2nd power */
             d1 = sgnorm / delta;
-            alpha = delta / qnorm * (1. - d1 * d1) / temp;
+            alpha = delta / qnorm * (1.f - d1 * d1) / temp;
         }
     }
 
 /*     form appropriate convex combination of the gauss-newton */
 /*     direction and the scaled gradient direction. */
 
-    temp = (1. - alpha) * min(sgnorm,delta);
+    temp = (1.f - alpha) * min(sgnorm,delta);
     for (j = 1; j <= n; ++j) {
 	x[j] = temp * wa1[j] + alpha * x[j];
     }

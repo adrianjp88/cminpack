@@ -17,8 +17,8 @@ void __minpack_func__(r1updt)(const int *m, const int *n, real *s, const int *
 {
     /* Initialized data */
 
-#define p5 .5
-#define p25 .25
+#define p5 .5f
+#define p25 .25f
     const int c__3 = 3;
 
     /* System generated locals */
@@ -92,7 +92,7 @@ void __minpack_func__(r1updt)(const int *m, const int *n, real *s, const int *
 
 /*       minpack-supplied ... dpmpar */
 
-/*       fortran-supplied ... dabs,dsqrt */
+/*       fortran-supplied ... dabs,dsqrtf */
 
 /*     argonne national laboratory. minpack project. march 1980. */
 /*     burton s. garbow, kenneth e. hillstrom, jorge j. more, */
@@ -137,8 +137,8 @@ void __minpack_func__(r1updt)(const int *m, const int *n, real *s, const int *
     for (nmj = 1; nmj <= i__1; ++nmj) {
 	j = *n - nmj;
 	jj -= *m - j + 1;
-	w[j] = 0.;
-	if (v[j] == 0.) {
+	w[j] = 0.f;
+	if (v[j] == 0.f) {
 	    goto L50;
 	}
 
@@ -151,18 +151,18 @@ void __minpack_func__(r1updt)(const int *m, const int *n, real *s, const int *
 	cotan = v[*n] / v[j];
 /* Computing 2nd power */
 	d__1 = cotan;
-	sin__ = p5 / sqrt(p25 + p25 * (d__1 * d__1));
+	sin__ = p5 / sqrtf(p25 + p25 * (d__1 * d__1));
 	cos__ = sin__ * cotan;
-	tau = 1.;
-	if (abs(cos__) * giant > 1.) {
-	    tau = 1. / cos__;
+	tau = 1.f;
+	if (abs(cos__) * giant > 1.f) {
+	    tau = 1.f / cos__;
 	}
 	goto L30;
 L20:
 	tan__ = v[j] / v[*n];
 /* Computing 2nd power */
 	d__1 = tan__;
-	cos__ = p5 / sqrt(p25 + p25 * (d__1 * d__1));
+	cos__ = p5 / sqrtf(p25 + p25 * (d__1 * d__1));
 	sin__ = cos__ * tan__;
 	tau = sin__;
 L30:
@@ -206,7 +206,7 @@ L70:
     }
     i__1 = nm1;
     for (j = 1; j <= i__1; ++j) {
-	if (w[j] == 0.) {
+	if (w[j] == 0.f) {
 	    goto L120;
 	}
 
@@ -219,18 +219,18 @@ L70:
 	cotan = s[jj] / w[j];
 /* Computing 2nd power */
 	d__1 = cotan;
-	sin__ = p5 / sqrt(p25 + p25 * (d__1 * d__1));
+	sin__ = p5 / sqrtf(p25 + p25 * (d__1 * d__1));
 	cos__ = sin__ * cotan;
-	tau = 1.;
-	if (abs(cos__) * giant > 1.) {
-	    tau = 1. / cos__;
+	tau = 1.f;
+	if (abs(cos__) * giant > 1.f) {
+	    tau = 1.f / cos__;
 	}
 	goto L100;
 L90:
 	tan__ = w[j] / s[jj];
 /* Computing 2nd power */
 	d__1 = tan__;
-	cos__ = p5 / sqrt(p25 + p25 * (d__1 * d__1));
+	cos__ = p5 / sqrtf(p25 + p25 * (d__1 * d__1));
 	sin__ = cos__ * tan__;
 	tau = sin__;
 L100:
@@ -255,7 +255,7 @@ L120:
 
 /*        test for zero diagonal elements in the output s. */
 
-	if (s[jj] == 0.) {
+	if (s[jj] == 0.f) {
 	    *sing = TRUE_;
 	}
 	jj += *m - j + 1;
@@ -272,7 +272,7 @@ L140:
 	++l;
 /* L150: */
     }
-    if (s[jj] == 0.) {
+    if (s[jj] == 0.f) {
 	*sing = TRUE_;
     }
     return;

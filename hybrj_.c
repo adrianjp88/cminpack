@@ -22,10 +22,10 @@ void __minpack_func__(hybrj)(__minpack_decl_fcnder_nn__  const int *n, real *x, 
 {
     /* Initialized data */
 
-#define p1 .1
-#define p5 .5
-#define p001 .001
-#define p0001 1e-4
+#define p1 .1f
+#define p5 .5f
+#define p001 .001f
+#define p0001 1e-4f
     const int c_false = FALSE_;
     const int c__1 = 1;
 
@@ -121,13 +121,13 @@ void __minpack_func__(hybrj)(__minpack_decl_fcnder_nn__  const int *n, real *x, 
 /*       mode is an integer input variable. if mode = 1, the */
 /*         variables will be scaled internally. if mode = 2, */
 /*         the scaling is specified by the input diag. other */
-/*         values of mode are equivalent to mode = 1. */
+/*         values of mode are equivalent to mode = 1.f */
 
 /*       factor is a positive input variable used in determining the */
 /*         initial step bound. this bound is set to the product of */
 /*         factor and the euclidean norm of diag*x if nonzero, or else */
 /*         to factor itself. in most cases factor should lie in the */
-/*         interval (.1,100.). 100. is a generally recommended value. */
+/*         interval (.1,100.f). 100. is a generally recommended value. */
 
 /*       nprint is an integer input variable that enables controlled */
 /*         printing of iterates if it is positive. in this case, */
@@ -163,7 +163,7 @@ void __minpack_func__(hybrj)(__minpack_decl_fcnder_nn__  const int *n, real *x, 
 /*                    ten iterations. */
 
 /*       nfev is an integer output variable set to the number of */
-/*         calls to fcn with iflag = 1. */
+/*         calls to fcn with iflag = 1.f */
 
 /*       njev is an integer output variable set to the number of */
 /*         calls to fcn with iflag = 2. */
@@ -220,8 +220,8 @@ void __minpack_func__(hybrj)(__minpack_decl_fcnder_nn__  const int *n, real *x, 
 
 /*     check the input parameters for errors. */
 
-    if (*n <= 0 || *ldfjac < *n || *xtol < 0. || *maxfev <= 0 || *factor <= 
-	    0. || *lr < *n * (*n + 1) / 2) {
+    if (*n <= 0 || *ldfjac < *n || *xtol < 0.f || *maxfev <= 0 || *factor <= 
+	    0.f || *lr < *n * (*n + 1) / 2) {
 	goto L300;
     }
     if (*mode != 2) {
@@ -229,7 +229,7 @@ void __minpack_func__(hybrj)(__minpack_decl_fcnder_nn__  const int *n, real *x, 
     }
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	if (diag[j] <= 0.) {
+	if (diag[j] <= 0.f) {
 	    goto L300;
 	}
 /* L10: */
@@ -286,8 +286,8 @@ L30:
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
 	diag[j] = wa2[j];
-	if (wa2[j] == 0.) {
-	    diag[j] = 1.;
+	if (wa2[j] == 0.f) {
+	    diag[j] = 1.f;
 	}
 /* L40: */
     }
@@ -303,7 +303,7 @@ L50:
     }
     xnorm = __minpack_func__(enorm)(n, &wa3[1]);
     delta = *factor * xnorm;
-    if (delta == 0.) {
+    if (delta == 0.f) {
 	delta = *factor;
     }
 L70:
@@ -317,10 +317,10 @@ L70:
     }
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	if (fjac[j + j * fjac_dim1] == 0.) {
+	if (fjac[j + j * fjac_dim1] == 0.f) {
 	    goto L110;
 	}
-	sum = 0.;
+	sum = 0.f;
 	i__2 = *n;
 	for (i__ = j; i__ <= i__2; ++i__) {
 	    sum += fjac[i__ + j * fjac_dim1] * qtf[i__];
@@ -355,7 +355,7 @@ L110:
 	}
 L140:
 	r__[l] = wa1[j];
-	if (wa1[j] == 0.) {
+	if (wa1[j] == 0.f) {
 	    sing = TRUE_;
 	}
 /* L150: */
@@ -431,11 +431,11 @@ L190:
 
 /*           compute the scaled actual reduction. */
 
-    actred = -1.;
+    actred = -1.f;
     if (fnorm1 < fnorm) {
 /* Computing 2nd power */
 	d__1 = fnorm1 / fnorm;
-	actred = 1. - d__1 * d__1;
+	actred = 1.f - d__1 * d__1;
     }
 
 /*           compute the scaled predicted reduction. */
@@ -443,7 +443,7 @@ L190:
     l = 1;
     i__1 = *n;
     for (i__ = 1; i__ <= i__1; ++i__) {
-	sum = 0.;
+	sum = 0.f;
 	i__2 = *n;
 	for (j = i__; j <= i__2; ++j) {
 	    sum += r__[l] * wa1[j];
@@ -454,18 +454,18 @@ L190:
 /* L220: */
     }
     temp = __minpack_func__(enorm)(n, &wa3[1]);
-    prered = 0.;
+    prered = 0.f;
     if (temp < fnorm) {
 /* Computing 2nd power */
 	d__1 = temp / fnorm;
-	prered = 1. - d__1 * d__1;
+	prered = 1.f - d__1 * d__1;
     }
 
 /*           compute the ratio of the actual to the predicted */
 /*           reduction. */
 
-    ratio = 0.;
-    if (prered > 0.) {
+    ratio = 0.f;
+    if (prered > 0.f) {
 	ratio = actred / prered;
     }
 
@@ -486,7 +486,7 @@ L230:
 	d__1 = delta, d__2 = pnorm / p5;
 	delta = max(d__1,d__2);
     }
-    if (fabs(ratio - 1.) <= p1) {
+    if (fabsf(ratio - 1.f) <= p1) {
 	delta = pnorm / p5;
     }
 L240:
@@ -526,7 +526,7 @@ L260:
 
 /*           test for convergence. */
 
-    if (delta <= *xtol * xnorm || fnorm == 0.) {
+    if (delta <= *xtol * xnorm || fnorm == 0.f) {
 	*info = 1;
     }
     if (*info != 0) {
@@ -564,7 +564,7 @@ L260:
 
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	sum = 0.;
+	sum = 0.f;
 	i__2 = *n;
 	for (i__ = 1; i__ <= i__2; ++i__) {
 	    sum += fjac[i__ + j * fjac_dim1] * wa4[i__];

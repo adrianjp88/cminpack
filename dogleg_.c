@@ -79,7 +79,7 @@ void __minpack_func__(dogleg)(const int *n, const real *r__, const int *lr,
 
 /*       minpack-supplied ... dpmpar,enorm */
 
-/*       fortran-supplied ... dabs,dmax1,dmin1,dsqrt */
+/*       fortran-supplied ... dabs,dmax1,dmin1,dsqrtf */
 
 /*     argonne national laboratory. minpack project. march 1980. */
 /*     burton s. garbow, kenneth e. hillstrom, jorge j. more */
@@ -109,7 +109,7 @@ void __minpack_func__(dogleg)(const int *n, const real *r__, const int *lr,
 	jp1 = j + 1;
 	jj -= k;
 	l = jj + 1;
-	sum = 0.;
+	sum = 0.f;
 	if (*n < jp1) {
 	    goto L20;
 	}
@@ -121,20 +121,20 @@ void __minpack_func__(dogleg)(const int *n, const real *r__, const int *lr,
 	}
 L20:
 	temp = r__[jj];
-	if (temp != 0.) {
+	if (temp != 0.f) {
 	    goto L40;
 	}
 	l = j;
 	i__2 = j;
 	for (i__ = 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-	    d__2 = temp, d__3 = fabs(r__[l]);
+	    d__2 = temp, d__3 = fabsf(r__[l]);
 	    temp = max(d__2,d__3);
 	    l = l + *n - i__;
 /* L30: */
 	}
 	temp = epsmch * temp;
-	if (temp == 0.) {
+	if (temp == 0.f) {
 	    temp = epsmch;
 	}
 L40:
@@ -146,7 +146,7 @@ L40:
 
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	wa1[j] = 0.;
+	wa1[j] = 0.f;
 	wa2[j] = diag[j] * x[j];
 /* L60: */
     }
@@ -177,9 +177,9 @@ L40:
 /*     the special case in which the scaled gradient is zero. */
 
     gnorm = __minpack_func__(enorm)(n, &wa1[1]);
-    sgnorm = 0.;
+    sgnorm = 0.f;
     alpha = *delta / qnorm;
-    if (gnorm == 0.) {
+    if (gnorm == 0.f) {
 	goto L120;
     }
 
@@ -194,7 +194,7 @@ L40:
     l = 1;
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	sum = 0.;
+	sum = 0.f;
 	i__2 = *n;
 	for (i__ = j; i__ <= i__2; ++i__) {
 	    sum += r__[l] * wa1[i__];
@@ -209,7 +209,7 @@ L40:
 
 /*     test whether the scaled gradient direction is acceptable. */
 
-    alpha = 0.;
+    alpha = 0.f;
     if (sgnorm >= *delta) {
 	goto L120;
     }
@@ -228,17 +228,17 @@ L40:
     d__3 = *delta / qnorm;
 /* Computing 2nd power */
     d__4 = sgnorm / *delta;
-    temp = temp - *delta / qnorm * (d__1 * d__1) + sqrt(d__2 * d__2 + (1. - 
-	    d__3 * d__3) * (1. - d__4 * d__4));
+    temp = temp - *delta / qnorm * (d__1 * d__1) + sqrtf(d__2 * d__2 + (1.f - 
+	    d__3 * d__3) * (1.f - d__4 * d__4));
 /* Computing 2nd power */
     d__1 = sgnorm / *delta;
-    alpha = *delta / qnorm * (1. - d__1 * d__1) / temp;
+    alpha = *delta / qnorm * (1.f - d__1 * d__1) / temp;
 L120:
 
 /*     form appropriate convex combination of the gauss-newton */
 /*     direction and the scaled gradient direction. */
 
-    temp = (1. - alpha) * min(sgnorm,*delta);
+    temp = (1.f - alpha) * min(sgnorm,*delta);
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
 	x[j] = temp * wa1[j] + alpha * x[j];

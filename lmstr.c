@@ -12,11 +12,11 @@ int __cminpack_func__(lmstr)(__cminpack_decl_fcnderstr_mn__ void *p, int m, int 
 {
     /* Initialized data */
 
-#define p1 .1
-#define p5 .5
-#define p25 .25
+#define p1 .1f
+#define p5 .5f
+#define p25 .25f
 #define p75 .75
-#define p0001 1e-4
+#define p0001 1e-4f
 
     /* System generated locals */
     real d1, d2;
@@ -28,9 +28,9 @@ int __cminpack_func__(lmstr)(__cminpack_decl_fcnderstr_mn__ void *p, int m, int 
     int iter;
     real temp, temp1, temp2;
     int iflag;
-    real delta = 0.;
+    real delta = 0.f;
     real ratio;
-    real fnorm, gnorm, pnorm, xnorm = 0., fnorm1, actred, dirder, 
+    real fnorm, gnorm, pnorm, xnorm = 0.f, fnorm1, actred, dirder, 
 	    epsmch, prered;
     int info;
 
@@ -131,13 +131,13 @@ int __cminpack_func__(lmstr)(__cminpack_decl_fcnderstr_mn__ void *p, int m, int 
 /*       mode is an integer input variable. if mode = 1, the */
 /*         variables will be scaled internally. if mode = 2, */
 /*         the scaling is specified by the input diag. other */
-/*         values of mode are equivalent to mode = 1. */
+/*         values of mode are equivalent to mode = 1.f */
 
 /*       factor is a positive input variable used in determining the */
 /*         initial step bound. this bound is set to the product of */
 /*         factor and the euclidean norm of diag*x if nonzero, or else */
 /*         to factor itself. in most cases factor should lie in the */
-/*         interval (.1,100.). 100. is a generally recommended value. */
+/*         interval (.1,100.f). 100. is a generally recommended value. */
 
 /*       nprint is an integer input variable that enables controlled */
 /*         printing of iterates if it is positive. in this case, */
@@ -179,7 +179,7 @@ int __cminpack_func__(lmstr)(__cminpack_decl_fcnderstr_mn__ void *p, int m, int 
 /*                   columns of the jacobian to machine precision. */
 
 /*       nfev is an integer output variable set to the number of */
-/*         calls to fcn with iflag = 1. */
+/*         calls to fcn with iflag = 1.f */
 
 /*       njev is an integer output variable set to the number of */
 /*         calls to fcn with iflag = 2. */
@@ -203,7 +203,7 @@ int __cminpack_func__(lmstr)(__cminpack_decl_fcnderstr_mn__ void *p, int m, int 
 
 /*       minpack-supplied ... dpmpar,enorm,lmpar,qrfac,rwupdt */
 
-/*       fortran-supplied ... dabs,dmax1,dmin1,dsqrt,mod */
+/*       fortran-supplied ... dabs,dmax1,dmin1,dsqrtf,mod */
 
 /*     argonne national laboratory. minpack project. march 1980. */
 /*     burton s. garbow, dudley v. goetschel, kenneth e. hillstrom, */
@@ -222,13 +222,13 @@ int __cminpack_func__(lmstr)(__cminpack_decl_fcnderstr_mn__ void *p, int m, int 
 
 /*     check the input parameters for errors. */
 
-    if (n <= 0 || m < n || ldfjac < n || ftol < 0. || xtol < 0. || 
-	    gtol < 0. || maxfev <= 0 || factor <= 0.) {
+    if (n <= 0 || m < n || ldfjac < n || ftol < 0.f || xtol < 0.f || 
+	    gtol < 0.f || maxfev <= 0 || factor <= 0.f) {
 	goto TERMINATE;
     }
     if (mode == 2) {
         for (j = 0; j < n; ++j) {
-            if (diag[j] <= 0.) {
+            if (diag[j] <= 0.f) {
                 goto TERMINATE;
             }
         }
@@ -246,7 +246,7 @@ int __cminpack_func__(lmstr)(__cminpack_decl_fcnderstr_mn__ void *p, int m, int 
 
 /*     initialize levenberg-marquardt parameter and iteration counter. */
 
-    par = 0.;
+    par = 0.f;
     iter = 1;
 
 /*     beginning of the outer loop. */
@@ -271,9 +271,9 @@ int __cminpack_func__(lmstr)(__cminpack_decl_fcnderstr_mn__ void *p, int m, int 
 /*        n components in qtf. */
 
         for (j = 0; j < n; ++j) {
-            qtf[j] = 0.;
+            qtf[j] = 0.f;
             for (i = 0; i < n; ++i) {
-                fjac[i + j * ldfjac] = 0.;
+                fjac[i + j * ldfjac] = 0.f;
             }
         }
         iflag = 2;
@@ -293,7 +293,7 @@ int __cminpack_func__(lmstr)(__cminpack_decl_fcnderstr_mn__ void *p, int m, int 
 
         sing = FALSE_;
         for (j = 0; j < n; ++j) {
-            if (fjac[j + j * ldfjac] == 0.) {
+            if (fjac[j + j * ldfjac] == 0.f) {
                 sing = TRUE_;
             }
             ipvt[j] = j+1;
@@ -303,8 +303,8 @@ int __cminpack_func__(lmstr)(__cminpack_decl_fcnderstr_mn__ void *p, int m, int 
             __cminpack_func__(qrfac)(n, n, fjac, ldfjac, TRUE_, ipvt, n,
                   wa1, wa2, wa3);
             for (j = 0; j < n; ++j) {
-                if (fjac[j + j * ldfjac] != 0.) {
-                    sum = 0.;
+                if (fjac[j + j * ldfjac] != 0.f) {
+                    sum = 0.f;
                     for (i = j; i < n; ++i) {
                         sum += fjac[i + j * ldfjac] * qtf[i];
                     }
@@ -324,8 +324,8 @@ int __cminpack_func__(lmstr)(__cminpack_decl_fcnderstr_mn__ void *p, int m, int 
             if (mode != 2) {
                 for (j = 0; j < n; ++j) {
                     diag[j] = wa2[j];
-                    if (wa2[j] == 0.) {
-                        diag[j] = 1.;
+                    if (wa2[j] == 0.f) {
+                        diag[j] = 1.f;
                     }
                 }
             }
@@ -338,24 +338,24 @@ int __cminpack_func__(lmstr)(__cminpack_decl_fcnderstr_mn__ void *p, int m, int 
             }
             xnorm = __cminpack_enorm__(n, wa3);
             delta = factor * xnorm;
-            if (delta == 0.) {
+            if (delta == 0.f) {
                 delta = factor;
             }
         }
 
 /*        compute the norm of the scaled gradient. */
 
-        gnorm = 0.;
-        if (fnorm != 0.) {
+        gnorm = 0.f;
+        if (fnorm != 0.f) {
             for (j = 0; j < n; ++j) {
                 l = ipvt[j]-1;
-                if (wa2[l] != 0.) {
-                    sum = 0.;
+                if (wa2[l] != 0.f) {
+                    sum = 0.f;
                     for (i = 0; i <= j; ++i) {
                         sum += fjac[i + j * ldfjac] * (qtf[i] / fnorm);
                     }
                     /* Computing MAX */
-                    d1 = fabs(sum / wa2[l]);
+                    d1 = fabsf(sum / wa2[l]);
                     gnorm = max(gnorm,d1);
                 }
             }
@@ -415,18 +415,18 @@ int __cminpack_func__(lmstr)(__cminpack_decl_fcnderstr_mn__ void *p, int m, int 
 
 /*           compute the scaled actual reduction. */
 
-            actred = -1.;
+            actred = -1.f;
             if (p1 * fnorm1 < fnorm) {
                 /* Computing 2nd power */
                 d1 = fnorm1 / fnorm;
-                actred = 1. - d1 * d1;
+                actred = 1.f - d1 * d1;
             }
 
 /*           compute the scaled predicted reduction and */
 /*           the scaled directional derivative. */
 
             for (j = 0; j < n; ++j) {
-                wa3[j] = 0.;
+                wa3[j] = 0.f;
                 l = ipvt[j]-1;
                 temp = wa1[l];
                 for (i = 0; i <= j; ++i) {
@@ -434,22 +434,22 @@ int __cminpack_func__(lmstr)(__cminpack_decl_fcnderstr_mn__ void *p, int m, int 
                 }
             }
             temp1 = __cminpack_enorm__(n, wa3) / fnorm;
-            temp2 = (sqrt(par) * pnorm) / fnorm;
+            temp2 = (sqrtf(par) * pnorm) / fnorm;
             prered = temp1 * temp1 + temp2 * temp2 / p5;
             dirder = -(temp1 * temp1 + temp2 * temp2);
 
 /*           compute the ratio of the actual to the predicted */
 /*           reduction. */
 
-            ratio = 0.;
-            if (prered != 0.) {
+            ratio = 0.f;
+            if (prered != 0.f) {
                 ratio = actred / prered;
             }
 
 /*           update the step bound. */
 
             if (ratio <= p25) {
-                if (actred >= 0.) {
+                if (actred >= 0.f) {
                     temp = p5;
                 } else {
                     temp = p5 * dirder / (dirder + p5 * actred);
@@ -462,7 +462,7 @@ int __cminpack_func__(lmstr)(__cminpack_decl_fcnderstr_mn__ void *p, int m, int 
                 delta = temp * min(delta,d1);
                 par /= temp;
             } else {
-                if (par == 0. || ratio >= p75) {
+                if (par == 0.f || ratio >= p75) {
                     delta = pnorm / p5;
                     par = p5 * par;
                 }
@@ -488,13 +488,13 @@ int __cminpack_func__(lmstr)(__cminpack_decl_fcnderstr_mn__ void *p, int m, int 
 
 /*           tests for convergence. */
 
-            if (fabs(actred) <= ftol && prered <= ftol && p5 * ratio <= 1.) {
+            if (fabsf(actred) <= ftol && prered <= ftol && p5 * ratio <= 1.f) {
                 info = 1;
             }
             if (delta <= xtol * xnorm) {
                 info = 2;
             }
-            if (fabs(actred) <= ftol && prered <= ftol && p5 * ratio <= 1. && info == 2) {
+            if (fabsf(actred) <= ftol && prered <= ftol && p5 * ratio <= 1.f && info == 2) {
                 info = 3;
             }
             if (info != 0) {
@@ -506,7 +506,7 @@ int __cminpack_func__(lmstr)(__cminpack_decl_fcnderstr_mn__ void *p, int m, int 
             if (*nfev >= maxfev) {
                 info = 5;
             }
-            if (fabs(actred) <= epsmch && prered <= epsmch && p5 * ratio <= 1.) {
+            if (fabsf(actred) <= epsmch && prered <= epsmch && p5 * ratio <= 1.f) {
                 info = 6;
             }
             if (delta <= epsmch * xnorm) {

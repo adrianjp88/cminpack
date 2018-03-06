@@ -61,7 +61,7 @@ void __minpack_func__(fdjac1)(__minpack_decl_fcn_nn__ const int *n, real *x, con
 /*         end */
 
 /*         the value of iflag should not be changed by fcn unless */
-/*         the user wants to terminate execution of fdjac1. */
+/*         the user wants to terminate execution of fdjac1.f */
 /*         in this case set iflag to a negative integer. */
 
 /*       n is a positive integer input variable set to the number */
@@ -79,12 +79,12 @@ void __minpack_func__(fdjac1)(__minpack_decl_fcn_nn__ const int *n, real *x, con
 /*         which specifies the leading dimension of the array fjac. */
 
 /*       iflag is an integer variable which can be used to terminate */
-/*         the execution of fdjac1. see description of fcn. */
+/*         the execution of fdjac1.f see description of fcn. */
 
 /*       ml is a nonnegative integer input variable which specifies */
 /*         the number of subdiagonals within the band of the */
 /*         jacobian matrix. if the jacobian is not banded, set */
-/*         ml to at least n - 1. */
+/*         ml to at least n - 1.f */
 
 /*       epsfcn is an input variable used in determining a suitable */
 /*         step length for the forward-difference approximation. this */
@@ -97,7 +97,7 @@ void __minpack_func__(fdjac1)(__minpack_decl_fcn_nn__ const int *n, real *x, con
 /*       mu is a nonnegative integer input variable which specifies */
 /*         the number of superdiagonals within the band of the */
 /*         jacobian matrix. if the jacobian is not banded, set */
-/*         mu to at least n - 1. */
+/*         mu to at least n - 1.f */
 
 /*       wa1 and wa2 are work arrays of length n. if ml + mu + 1 is at */
 /*         least n, then the jacobian is considered dense, and wa2 is */
@@ -107,7 +107,7 @@ void __minpack_func__(fdjac1)(__minpack_decl_fcn_nn__ const int *n, real *x, con
 
 /*       minpack-supplied ... dpmpar */
 
-/*       fortran-supplied ... dabs,dmax1,dsqrt */
+/*       fortran-supplied ... dabs,dmax1,dsqrtf */
 
 /*     argonne national laboratory. minpack project. march 1980. */
 /*     burton s. garbow, kenneth e. hillstrom, jorge j. more */
@@ -128,7 +128,7 @@ void __minpack_func__(fdjac1)(__minpack_decl_fcn_nn__ const int *n, real *x, con
 
     epsmch = __minpack_func__(dpmpar)(&c__1);
 
-    eps = sqrt((max(*epsfcn,epsmch)));
+    eps = sqrtf((max(*epsfcn,epsmch)));
     msum = *ml + *mu + 1;
     if (msum < *n) {
 	goto L40;
@@ -139,8 +139,8 @@ void __minpack_func__(fdjac1)(__minpack_decl_fcn_nn__ const int *n, real *x, con
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
 	temp = x[j];
-	h__ = eps * fabs(temp);
-	if (h__ == 0.) {
+	h__ = eps * fabsf(temp);
+	if (h__ == 0.f) {
 	    h__ = eps;
 	}
 	x[j] = temp + h__;
@@ -169,8 +169,8 @@ L40:
 	i__3 = msum;
 	for (j = k; i__3 < 0 ? j >= i__2 : j <= i__2; j += i__3) {
 	    wa2[j] = x[j];
-	    h__ = eps * fabs(wa2[j]);
-	    if (h__ == 0.) {
+	    h__ = eps * fabsf(wa2[j]);
+	    if (h__ == 0.f) {
 		h__ = eps;
 	    }
 	    x[j] = wa2[j] + h__;
@@ -185,13 +185,13 @@ L40:
 	i__2 = msum;
 	for (j = k; i__2 < 0 ? j >= i__3 : j <= i__3; j += i__2) {
 	    x[j] = wa2[j];
-	    h__ = eps * fabs(wa2[j]);
-	    if (h__ == 0.) {
+	    h__ = eps * fabsf(wa2[j]);
+	    if (h__ == 0.f) {
 		h__ = eps;
 	    }
 	    i__4 = *n;
 	    for (i__ = 1; i__ <= i__4; ++i__) {
-		fjac[i__ + j * fjac_dim1] = 0.;
+		fjac[i__ + j * fjac_dim1] = 0.f;
 		if (i__ >= j - *mu && i__ <= j + *ml) {
 		    fjac[i__ + j * fjac_dim1] = (wa1[i__] - fvec[i__]) / h__;
 		}
@@ -205,7 +205,7 @@ L40:
 /* L110: */
     return;
 
-/*     last card of subroutine fdjac1. */
+/*     last card of subroutine fdjac1.f */
 
 } /* fdjac1_ */
 

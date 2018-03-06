@@ -84,7 +84,7 @@ void __minpack_func__(qrfac)(const int *m, const int *n, real *a, const int *
 /*         if pivot is false, ipvt is not referenced. */
 
 /*       lipvt is a positive integer input variable. if pivot is false, */
-/*         then lipvt may be as small as 1. if pivot is true, then */
+/*         then lipvt may be as small as 1.f if pivot is true, then */
 /*         lipvt must be at least n. */
 
 /*       rdiag is an output array of length n which contains the */
@@ -102,7 +102,7 @@ void __minpack_func__(qrfac)(const int *m, const int *n, real *a, const int *
 
 /*       minpack-supplied ... dpmpar,enorm */
 
-/*       fortran-supplied ... dmax1,dsqrt,min0 */
+/*       fortran-supplied ... dmax1,dsqrtf,min0 */
 
 /*     argonne national laboratory. minpack project. march 1980. */
 /*     burton s. garbow, kenneth e. hillstrom, jorge j. more */
@@ -178,10 +178,10 @@ L40:
 
 	i__2 = *m - j + 1;
 	ajnorm = __minpack_func__(enorm)(&i__2, &a[j + j * a_dim1]);
-	if (ajnorm == 0.) {
+	if (ajnorm == 0.f) {
 	    goto L100;
 	}
-	if (a[j + j * a_dim1] < 0.) {
+	if (a[j + j * a_dim1] < 0.f) {
 	    ajnorm = -ajnorm;
 	}
 	i__2 = *m;
@@ -189,7 +189,7 @@ L40:
 	    a[i__ + j * a_dim1] /= ajnorm;
 /* L50: */
 	}
-	a[j + j * a_dim1] += 1.;
+	a[j + j * a_dim1] += 1.f;
 
 /*        apply the transformation to the remaining columns */
 /*        and update the norms. */
@@ -200,7 +200,7 @@ L40:
 	}
 	i__2 = *n;
 	for (k = jp1; k <= i__2; ++k) {
-	    sum = 0.;
+	    sum = 0.f;
 	    i__3 = *m;
 	    for (i__ = j; i__ <= i__3; ++i__) {
 		sum += a[i__ + j * a_dim1] * a[i__ + k * a_dim1];
@@ -212,15 +212,15 @@ L40:
 		a[i__ + k * a_dim1] -= temp * a[i__ + j * a_dim1];
 /* L70: */
 	    }
-	    if (! (*pivot) || rdiag[k] == 0.) {
+	    if (! (*pivot) || rdiag[k] == 0.f) {
 		goto L80;
 	    }
 	    temp = a[j + k * a_dim1] / rdiag[k];
 /* Computing MAX */
 /* Computing 2nd power */
 	    d__3 = temp;
-	    d__1 = 0., d__2 = 1. - d__3 * d__3;
-	    rdiag[k] *= sqrt((max(d__1,d__2)));
+	    d__1 = 0.f, d__2 = 1.f - d__3 * d__3;
+	    rdiag[k] *= sqrtf((max(d__1,d__2)));
 /* Computing 2nd power */
 	    d__1 = rdiag[k] / wa[k];
 	    if (p05 * (d__1 * d__1) > epsmch) {

@@ -49,7 +49,7 @@ int __cminpack_func__(lmdif1)(__cminpack_decl_fcn_mn__ void *p, int m, int n, re
 /*         end */
 
 /*         the value of iflag should not be changed by fcn unless */
-/*         the user wants to terminate execution of lmdif1. */
+/*         the user wants to terminate execution of lmdif1.f */
 /*         in this case set iflag to a negative integer. */
 
 /*       m is a positive integer input variable set to the number */
@@ -118,7 +118,7 @@ int __cminpack_func__(lmdif1)(__cminpack_decl_fcn_mn__ void *p, int m, int n, re
 
 /*     check the input parameters for errors. */
 
-    if (n <= 0 || m < n || tol < 0. || lwa < m * n + n * 5 + m) {
+    if (n <= 0 || m < n || tol < 0.f || lwa < m * n + n * 5 + m) {
         return 0;
     }
 
@@ -127,8 +127,8 @@ int __cminpack_func__(lmdif1)(__cminpack_decl_fcn_mn__ void *p, int m, int n, re
     maxfev = (n + 1) * 200;
     ftol = tol;
     xtol = tol;
-    gtol = 0.;
-    epsfcn = 0.;
+    gtol = 0.f;
+    epsfcn = 0.f;
     mode = 1;
     nprint = 0;
     mp5n = m + n * 5;
@@ -141,7 +141,7 @@ int __cminpack_func__(lmdif1)(__cminpack_decl_fcn_mn__ void *p, int m, int n, re
     }
     return info;
 
-/*     last card of subroutine lmdif1. */
+/*     last card of subroutine lmdif1.f */
 
 } /* lmdif1_ */
 

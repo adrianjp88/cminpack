@@ -64,7 +64,7 @@ void __minpack_func__(r1mpyq)(const int *m, const int *n, real *a, const int *
 
 /*     subroutines called */
 
-/*       fortran-supplied ... dabs,dsqrt */
+/*       fortran-supplied ... dabs,dsqrtf */
 
 /*     argonne national laboratory. minpack project. march 1980. */
 /*     burton s. garbow, kenneth e. hillstrom, jorge j. more */
@@ -89,21 +89,21 @@ void __minpack_func__(r1mpyq)(const int *m, const int *n, real *a, const int *
     i__1 = nm1;
     for (nmj = 1; nmj <= i__1; ++nmj) {
 	j = *n - nmj;
-	if ((d__1 = v[j], abs(d__1)) > 1.) {
-	    cos__ = 1. / v[j];
+	if ((d__1 = v[j], abs(d__1)) > 1.f) {
+	    cos__ = 1.f / v[j];
 	}
-	if ((d__1 = v[j], abs(d__1)) > 1.) {
+	if ((d__1 = v[j], abs(d__1)) > 1.f) {
 /* Computing 2nd power */
 	    d__2 = cos__;
-	    sin__ = sqrt(1. - d__2 * d__2);
+	    sin__ = sqrtf(1.f - d__2 * d__2);
 	}
-	if ((d__1 = v[j], abs(d__1)) <= 1.) {
+	if ((d__1 = v[j], abs(d__1)) <= 1.f) {
 	    sin__ = v[j];
 	}
-	if ((d__1 = v[j], abs(d__1)) <= 1.) {
+	if ((d__1 = v[j], abs(d__1)) <= 1.f) {
 /* Computing 2nd power */
 	    d__2 = sin__;
-	    cos__ = sqrt(1. - d__2 * d__2);
+	    cos__ = sqrtf(1.f - d__2 * d__2);
 	}
 	i__2 = *m;
 	for (i__ = 1; i__ <= i__2; ++i__) {
@@ -120,21 +120,21 @@ void __minpack_func__(r1mpyq)(const int *m, const int *n, real *a, const int *
 
     i__1 = nm1;
     for (j = 1; j <= i__1; ++j) {
-	if ((d__1 = w[j], abs(d__1)) > 1.) {
-	    cos__ = 1. / w[j];
+	if ((d__1 = w[j], abs(d__1)) > 1.f) {
+	    cos__ = 1.f / w[j];
 	}
-	if ((d__1 = w[j], abs(d__1)) > 1.) {
+	if ((d__1 = w[j], abs(d__1)) > 1.f) {
 /* Computing 2nd power */
 	    d__2 = cos__;
-	    sin__ = sqrt(1. - d__2 * d__2);
+	    sin__ = sqrtf(1.f - d__2 * d__2);
 	}
-	if ((d__1 = w[j], abs(d__1)) <= 1.) {
+	if ((d__1 = w[j], abs(d__1)) <= 1.f) {
 	    sin__ = w[j];
 	}
-	if ((d__1 = w[j], abs(d__1)) <= 1.) {
+	if ((d__1 = w[j], abs(d__1)) <= 1.f) {
 /* Computing 2nd power */
 	    d__2 = sin__;
-	    cos__ = sqrt(1. - d__2 * d__2);
+	    cos__ = sqrtf(1.f - d__2 * d__2);
 	}
 	i__2 = *m;
 	for (i__ = 1; i__ <= i__2; ++i__) {

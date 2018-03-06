@@ -94,7 +94,7 @@ void __minpack_func__(covar)(const int *n, real *r__, const int *ldr,
     /* Parameter adjustments */
     --wa;
     --ipvt;
-    tolr = *tol * fabs(r__[0]);
+    tolr = *tol * fabsf(r__[0]);
     r_dim1 = *ldr;
     r_offset = 1 + r_dim1;
     r__ -= r_offset;
@@ -106,10 +106,10 @@ void __minpack_func__(covar)(const int *n, real *r__, const int *ldr,
     l = 0;
     i__1 = *n;
     for (k = 1; k <= i__1; ++k) {
-	if (fabs(r__[k + k * r_dim1]) <= tolr) {
+	if (fabsf(r__[k + k * r_dim1]) <= tolr) {
 	    goto L50;
 	}
-	r__[k + k * r_dim1] = 1. / r__[k + k * r_dim1];
+	r__[k + k * r_dim1] = 1.f / r__[k + k * r_dim1];
 	km1 = k - 1;
 	if (km1 < 1) {
 	    goto L30;
@@ -117,7 +117,7 @@ void __minpack_func__(covar)(const int *n, real *r__, const int *ldr,
 	i__2 = km1;
 	for (j = 1; j <= i__2; ++j) {
 	    temp = r__[k + k * r_dim1] * r__[j + k * r_dim1];
-	    r__[j + k * r_dim1] = 0.;
+	    r__[j + k * r_dim1] = 0.f;
 	    i__3 = j;
 	    for (i__ = 1; i__ <= i__3; ++i__) {
 		r__[i__ + k * r_dim1] -= temp * r__[i__ + j * r_dim1];
@@ -174,7 +174,7 @@ L110:
 	i__2 = j;
 	for (i__ = 1; i__ <= i__2; ++i__) {
 	    if (sing) {
-		r__[i__ + j * r_dim1] = 0.;
+		r__[i__ + j * r_dim1] = 0.f;
 	    }
 	    ii = ipvt[i__];
 	    if (ii > jj) {

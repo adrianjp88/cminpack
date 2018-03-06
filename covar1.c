@@ -82,20 +82,20 @@ int __cminpack_func__(covar1)(int m, int n, real fsumsq, real *r, int ldr,
 /*     burton s. garbow, kenneth e. hillstrom, jorge j. more */
 
 /*     ********** */
-    tolr = tol * fabs(r[0]);
+    tolr = tol * fabsf(r[0]);
 
 /*     form the inverse of r in the full upper triangle of r. */
 
     l = -1;
     for (k = 0; k < n; ++k) {
-	if (fabs(r[k + k * ldr]) <= tolr) {
+	if (fabsf(r[k + k * ldr]) <= tolr) {
 	    break;
 	}
-	r[k + k * ldr] = 1. / r[k + k * ldr];
+	r[k + k * ldr] = 1.f / r[k + k * ldr];
 	if (k > 0) {
             for (j = 0; j < k; ++j) {
                 temp = r[k + k * ldr] * r[j + k * ldr];
-                r[j + k * ldr] = 0.;
+                r[j + k * ldr] = 0.f;
                 for (i = 0; i <= j; ++i) {
                     r[i + k * ldr] -= temp * r[i + j * ldr];
                 }
@@ -132,7 +132,7 @@ int __cminpack_func__(covar1)(int m, int n, real fsumsq, real *r, int ldr,
 	sing = j > l;
 	for (i = 0; i <= j; ++i) {
 	    if (sing) {
-		r[i + j * ldr] = 0.;
+		r[i + j * ldr] = 0.f;
 	    }
 	    ii = ipvt[i]-1;
 	    if (ii > jj) {

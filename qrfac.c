@@ -165,7 +165,7 @@ void __cminpack_func__(qrfac)(int m, int n, real *a, int
 /*         if pivot is false, ipvt is not referenced. */
 
 /*       lipvt is a positive integer input variable. if pivot is false, */
-/*         then lipvt may be as small as 1. if pivot is true, then */
+/*         then lipvt may be as small as 1.f if pivot is true, then */
 /*         lipvt must be at least n. */
 
 /*       rdiag is an output array of length n which contains the */
@@ -183,7 +183,7 @@ void __cminpack_func__(qrfac)(int m, int n, real *a, int
 
 /*       minpack-supplied ... dpmpar,enorm */
 
-/*       fortran-supplied ... dmax1,dsqrt,min0 */
+/*       fortran-supplied ... dmax1,dsqrtf,min0 */
 
 /*     argonne national laboratory. minpack project. march 1980. */
 /*     burton s. garbow, kenneth e. hillstrom, jorge j. more */
@@ -238,14 +238,14 @@ void __cminpack_func__(qrfac)(int m, int n, real *a, int
 /*        j-th column of a to a multiple of the j-th unit vector. */
 
 	ajnorm = __cminpack_enorm__(m - (j+1) + 1, &a[j + j * lda]);
-	if (ajnorm != 0.) {
-            if (a[j + j * lda] < 0.) {
+	if (ajnorm != 0.f) {
+            if (a[j + j * lda] < 0.f) {
                 ajnorm = -ajnorm;
             }
             for (i = j; i < m; ++i) {
                 a[i + j * lda] /= ajnorm;
             }
-            a[j + j * lda] += 1.;
+            a[j + j * lda] += 1.f;
 
 /*        apply the transformation to the remaining columns */
 /*        and update the norms. */
@@ -253,7 +253,7 @@ void __cminpack_func__(qrfac)(int m, int n, real *a, int
             jp1 = j + 1;
             if (n > jp1) {
                 for (k = jp1; k < n; ++k) {
-                    sum = 0.;
+                    sum = 0.f;
                     for (i = j; i < m; ++i) {
                         sum += a[i + j * lda] * a[i + k * lda];
                     }
@@ -261,11 +261,11 @@ void __cminpack_func__(qrfac)(int m, int n, real *a, int
                     for (i = j; i < m; ++i) {
                         a[i + k * lda] -= temp * a[i + j * lda];
                     }
-                    if (pivot && rdiag[k] != 0.) {
+                    if (pivot && rdiag[k] != 0.f) {
                         temp = a[j + k * lda] / rdiag[k];
                         /* Computing MAX */
-                        d1 = 1. - temp * temp;
-                        rdiag[k] *= sqrt((max((real)0.,d1)));
+                        d1 = 1.f - temp * temp;
+                        rdiag[k] *= sqrtf((max((real)0.f,d1)));
                         /* Computing 2nd power */
                         d1 = rdiag[k] / wa[k];
                         if (p05 * (d1 * d1) <= epsmch) {

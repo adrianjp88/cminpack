@@ -14,8 +14,8 @@ void __cminpack_func__(rwupdt)(int n, real *r, int ldr,
 {
     /* Initialized data */
 
-#define p5 .5
-#define p25 .25
+#define p5 .5f
+#define p25 .25f
 
     /* System generated locals */
     int r_dim1, r_offset;
@@ -78,7 +78,7 @@ void __cminpack_func__(rwupdt)(int n, real *r, int ldr,
 
 /*     subprograms called */
 
-/*       fortran-supplied ... dabs,dsqrt */
+/*       fortran-supplied ... dabs,dsqrtf */
 
 /*     argonne national laboratory. minpack project. march 1980. */
 /*     burton s. garbow, dudley v. goetschel, kenneth e. hillstrom, */
@@ -113,16 +113,16 @@ void __cminpack_func__(rwupdt)(int n, real *r, int ldr,
 
 /*        determine a givens rotation which eliminates w(j). */
 
-	cos[j] = 1.;
-	sin[j] = 0.;
-	if (rowj != 0.) {
-            if (fabs(r[j + j * r_dim1]) < fabs(rowj)) {
+	cos[j] = 1.f;
+	sin[j] = 0.f;
+	if (rowj != 0.f) {
+            if (fabsf(r[j + j * r_dim1]) < fabsf(rowj)) {
                 cotan = r[j + j * r_dim1] / rowj;
-                sin[j] = p5 / sqrt(p25 + p25 * (cotan * cotan));
+                sin[j] = p5 / sqrtf(p25 + p25 * (cotan * cotan));
                 cos[j] = sin[j] * cotan;
             } else {
                 tan = rowj / r[j + j * r_dim1];
-                cos[j] = p5 / sqrt(p25 + p25 * (tan * tan));
+                cos[j] = p5 / sqrtf(p25 + p25 * (tan * tan));
                 sin[j] = cos[j] * tan;
             }
 

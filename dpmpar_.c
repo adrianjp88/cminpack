@@ -92,7 +92,7 @@ real __minpack_func__(dpmpar)(const int *i)
 /*     data minmag(1),minmag(2) / "000400000000, "000000000000 / */
 /*     data maxmag(1),maxmag(2) / "377777777777, "377777777777 / */
 
-/*     Machine constants for the PDP-11. */
+/*     Machine constants for the PDP-11.f */
 
 /*     data mcheps(1),mcheps(2) /   9472,      0 / */
 /*     data mcheps(3),mcheps(4) /      0,      0 / */
@@ -156,7 +156,7 @@ real __minpack_func__(dpmpar)(const int *i)
 /*     data minmag(1),minmag(2) / '20000000, '00000201 / */
 /*     data maxmag(1),maxmag(2) / '37777777, '37777577 / */
 
-/*     Machine constants for the Cray-1. */
+/*     Machine constants for the Cray-1.f */
 
 /*     data mcheps(1) / 0376424000000000000000b / */
 /*     data mcheps(2) / 0000000000000000000000b / */
@@ -173,7 +173,7 @@ real __minpack_func__(dpmpar)(const int *i)
 /*     data minmag(1),minmag(2) / :10000000000, :00000100000 / */
 /*     data maxmag(1),maxmag(2) / :17777777777, :37777677776 / */
 
-/*     Machine constants for the VAX-11. */
+/*     Machine constants for the VAX-11.f */
 
 /*     data mcheps(1),mcheps(2) /   9472,  0 / */
 /*     data minmag(1),minmag(2) /    128,  0 / */

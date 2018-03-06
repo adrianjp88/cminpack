@@ -15,8 +15,8 @@ void __cminpack_func__(lmpar)(int n, real *r, int ldr,
 {
     /* Initialized data */
 
-#define p1 .1
-#define p001 .001
+#define p1 .1f
+#define p001 .001f
 
     /* System generated locals */
     real d1, d2;
@@ -40,7 +40,7 @@ void __cminpack_func__(lmpar)(int n, real *r, int ldr,
 /*     the problem is to determine a value for the parameter */
 /*     par such that if x solves the system */
 
-/*           a*x = b ,     sqrt(par)*d*x = 0 , */
+/*           a*x = b ,     sqrtf(par)*d*x = 0 , */
 
 /*     in the least squares sense, and dxnorm is the euclidean */
 /*     norm of d*x, then either par is zero and */
@@ -107,7 +107,7 @@ void __cminpack_func__(lmpar)(int n, real *r, int ldr,
 /*         on output par contains the final estimate. */
 
 /*       x is an output array of length n which contains the least */
-/*         squares solution of the system a*x = b, sqrt(par)*d*x = 0, */
+/*         squares solution of the system a*x = b, sqrtf(par)*d*x = 0, */
 /*         for the output par. */
 
 /*       sdiag is an output array of length n which contains the */
@@ -119,7 +119,7 @@ void __cminpack_func__(lmpar)(int n, real *r, int ldr,
 
 /*       minpack-supplied ... dpmpar,enorm,qrsolv */
 
-/*       fortran-supplied ... dabs,dmax1,dmin1,dsqrt */
+/*       fortran-supplied ... dabs,dmax1,dmin1,dsqrtf */
 
 /*     argonne national laboratory. minpack project. march 1980. */
 /*     burton s. garbow, kenneth e. hillstrom, jorge j. more */
@@ -136,11 +136,11 @@ void __cminpack_func__(lmpar)(int n, real *r, int ldr,
     nsing = n;
     for (j = 0; j < n; ++j) {
 	wa1[j] = qtb[j];
-	if (r[j + j * ldr] == 0. && nsing == n) {
+	if (r[j + j * ldr] == 0.f && nsing == n) {
 	    nsing = j;
 	}
 	if (nsing < n) {
-	    wa1[j] = 0.;
+	    wa1[j] = 0.f;
 	}
     }
 # ifdef USE_CBLAS
@@ -184,7 +184,7 @@ void __cminpack_func__(lmpar)(int n, real *r, int ldr,
 /*     step provides a lower bound, parl, for the zero of */
 /*     the function. otherwise set this bound to zero. */
 
-    parl = 0.;
+    parl = 0.f;
     if (nsing >= n) {
         for (j = 0; j < n; ++j) {
             l = ipvt[j]-1;
@@ -194,7 +194,7 @@ void __cminpack_func__(lmpar)(int n, real *r, int ldr,
         cblas_dtrsv(CblasColMajor, CblasUpper, CblasTrans, CblasNonUnit, n, r, ldr, wa1, 1);
 #     else
         for (j = 0; j < n; ++j) {
-            real sum = 0.;
+            real sum = 0.f;
             if (j >= 1) {
                 int i;
                 for (i = 0; i < j; ++i) {
@@ -216,7 +216,7 @@ void __cminpack_func__(lmpar)(int n, real *r, int ldr,
         sum = cblas_ddot(j+1, &r[j*ldr], 1, qtb, 1);
 #     else
         int i;
-        sum = 0.;
+        sum = 0.f;
         for (i = 0; i <= j; ++i) {
             sum += r[i + j * ldr] * qtb[i];
         }
@@ -226,7 +226,7 @@ void __cminpack_func__(lmpar)(int n, real *r, int ldr,
     }
     gnorm = __cminpack_enorm__(n, wa1);
     paru = gnorm / delta;
-    if (paru == 0.) {
+    if (paru == 0.f) {
         paru = dwarf / min(delta,(real)p1) /* / p001 ??? */;
     }
 
@@ -235,7 +235,7 @@ void __cminpack_func__(lmpar)(int n, real *r, int ldr,
 
     *par = max(*par,parl);
     *par = min(*par,paru);
-    if (*par == 0.) {
+    if (*par == 0.f) {
         *par = gnorm / dxnorm;
     }
 
@@ -246,12 +246,12 @@ void __cminpack_func__(lmpar)(int n, real *r, int ldr,
 
 /*        evaluate the function at the current value of par. */
 
-        if (*par == 0.) {
+        if (*par == 0.f) {
             /* Computing MAX */
             d1 = dwarf, d2 = p001 * paru;
             *par = max(d1,d2);
         }
-        temp = sqrt(*par);
+        temp = sqrtf(*par);
         for (j = 0; j < n; ++j) {
             wa1[j] = temp * diag[j];
         }
@@ -267,7 +267,7 @@ void __cminpack_func__(lmpar)(int n, real *r, int ldr,
 /*        of par. also test for the exceptional cases where parl */
 /*        is zero or the number of iterations has reached 10. */
 
-        if (fabs(fp) <= p1 * delta || (parl == 0. && fp <= temp && temp < 0.) || iter == 10) {
+        if (fabsf(fp) <= p1 * delta || (parl == 0.f && fp <= temp && temp < 0.f) || iter == 10) {
             goto TERMINATE;
         }
 
@@ -279,7 +279,7 @@ void __cminpack_func__(lmpar)(int n, real *r, int ldr,
             wa1[j] = diag[l] * (wa2[l] / dxnorm);
         }
         for (j = nsing; j < n; ++j) {
-            wa1[j] = 0.;
+            wa1[j] = 0.f;
         }
         /* exchange the diagonal of r with sdiag */
         cblas_dswap(n, r, ldr+1, sdiag, 1);
@@ -308,10 +308,10 @@ void __cminpack_func__(lmpar)(int n, real *r, int ldr,
 
 /*        depending on the sign of the function, update parl or paru. */
 
-        if (fp > 0.) {
+        if (fp > 0.f) {
             parl = max(parl,*par);
         }
-        if (fp < 0.) {
+        if (fp < 0.f) {
             paru = min(paru,*par);
         }
 
@@ -329,7 +329,7 @@ TERMINATE:
 /*     termination. */
 
     if (iter == 0) {
-	*par = 0.;
+	*par = 0.f;
     }
 
 /*     last card of subroutine lmpar. */

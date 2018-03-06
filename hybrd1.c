@@ -56,7 +56,7 @@ int __cminpack_func__(hybrd1)(__cminpack_decl_fcn_nn__ void *p, int n, real *x, 
 /*         end */
 
 /*         the value of iflag should not be changed by fcn unless */
-/*         the user wants to terminate execution of hybrd1. */
+/*         the user wants to terminate execution of hybrd1.f */
 /*         in this case set iflag to a negative integer. */
 
 /*       n is a positive integer input variable set to the number */
@@ -115,7 +115,7 @@ int __cminpack_func__(hybrd1)(__cminpack_decl_fcn_nn__ void *p, int n, real *x, 
 
 /*     check the input parameters for errors. */
 
-    if (n <= 0 || tol < 0. || lwa < n * (n * 3 + 13) / 2) {
+    if (n <= 0 || tol < 0.f || lwa < n * (n * 3 + 13) / 2) {
         return 0;
     }
 
@@ -125,10 +125,10 @@ int __cminpack_func__(hybrd1)(__cminpack_decl_fcn_nn__ void *p, int n, real *x, 
     xtol = tol;
     ml = n - 1;
     mu = n - 1;
-    epsfcn = 0.;
+    epsfcn = 0.f;
     mode = 2;
     for (j = 1; j <= n; ++j) {
-	wa[j] = 1.;
+	wa[j] = 1.f;
     }
     nprint = 0;
     lr = n * (n + 1) / 2;
@@ -142,7 +142,7 @@ int __cminpack_func__(hybrd1)(__cminpack_decl_fcn_nn__ void *p, int n, real *x, 
     }
     return info;
 
-/*     last card of subroutine hybrd1. */
+/*     last card of subroutine hybrd1.f */
 
 } /* hybrd1_ */
 

@@ -77,7 +77,7 @@ void __minpack_func__(qform)(const int *m, const int *n, real *q, const int *
 	jm1 = j - 1;
 	i__2 = jm1;
 	for (i__ = 1; i__ <= i__2; ++i__) {
-	    q[i__ + j * q_dim1] = 0.;
+	    q[i__ + j * q_dim1] = 0.f;
 /* L10: */
 	}
 /* L20: */
@@ -94,10 +94,10 @@ L30:
     for (j = np1; j <= i__1; ++j) {
 	i__2 = *m;
 	for (i__ = 1; i__ <= i__2; ++i__) {
-	    q[i__ + j * q_dim1] = 0.;
+	    q[i__ + j * q_dim1] = 0.f;
 /* L40: */
 	}
-	q[j + j * q_dim1] = 1.;
+	q[j + j * q_dim1] = 1.f;
 /* L50: */
     }
 L60:
@@ -110,16 +110,16 @@ L60:
 	i__2 = *m;
 	for (i__ = k; i__ <= i__2; ++i__) {
 	    wa[i__] = q[i__ + k * q_dim1];
-	    q[i__ + k * q_dim1] = 0.;
+	    q[i__ + k * q_dim1] = 0.f;
 /* L70: */
 	}
-	q[k + k * q_dim1] = 1.;
-	if (wa[k] == 0.) {
+	q[k + k * q_dim1] = 1.f;
+	if (wa[k] == 0.f) {
 	    goto L110;
 	}
 	i__2 = *m;
 	for (j = k; j <= i__2; ++j) {
-	    sum = 0.;
+	    sum = 0.f;
 	    i__3 = *m;
 	    for (i__ = k; i__ <= i__3; ++i__) {
 		sum += q[i__ + j * q_dim1] * wa[i__];

@@ -16,8 +16,8 @@ void __minpack_func__(qrsolv)(const int *n, real *r__, const int *ldr,
 {
     /* Initialized data */
 
-#define p5 .5
-#define p25 .25
+#define p5 .5f
+#define p25 .25f
 
     /* System generated locals */
     int r_dim1, r_offset, i__1, i__2, i__3;
@@ -91,7 +91,7 @@ void __minpack_func__(qrsolv)(const int *n, real *r__, const int *ldr,
 /*         n elements of the vector (q transpose)*b. */
 
 /*       x is an output array of length n which contains the least */
-/*         squares solution of the system a*x = b, d*x = 0. */
+/*         squares solution of the system a*x = b, d*x = 0.f */
 
 /*       sdiag is an output array of length n which contains the */
 /*         diagonal elements of the upper triangular matrix s. */
@@ -100,7 +100,7 @@ void __minpack_func__(qrsolv)(const int *n, real *r__, const int *ldr,
 
 /*     subprograms called */
 
-/*       fortran-supplied ... dabs,dsqrt */
+/*       fortran-supplied ... dabs,dsqrtf */
 
 /*     argonne national laboratory. minpack project. march 1980. */
 /*     burton s. garbow, kenneth e. hillstrom, jorge j. more */
@@ -143,12 +143,12 @@ void __minpack_func__(qrsolv)(const int *n, real *r__, const int *ldr,
 /*        diagonal element using p from the qr factorization. */
 
 	l = ipvt[j];
-	if (diag[l] == 0.) {
+	if (diag[l] == 0.f) {
 	    goto L90;
 	}
 	i__2 = *n;
 	for (k = j; k <= i__2; ++k) {
-	    sdiag[k] = 0.;
+	    sdiag[k] = 0.f;
 /* L30: */
 	}
 	sdiag[j] = diag[l];
@@ -157,14 +157,14 @@ void __minpack_func__(qrsolv)(const int *n, real *r__, const int *ldr,
 /*        modify only a single element of (q transpose)*b */
 /*        beyond the first n, which is initially zero. */
 
-	qtbpj = 0.;
+	qtbpj = 0.f;
 	i__2 = *n;
 	for (k = j; k <= i__2; ++k) {
 
 /*           determine a givens rotation which eliminates the */
 /*           appropriate element in the current row of d. */
 
-	    if (sdiag[k] == 0.) {
+	    if (sdiag[k] == 0.f) {
 		goto L70;
 	    }
 	    if ((d__1 = r__[k + k * r_dim1], abs(d__1)) >= (d__2 = sdiag[k], 
@@ -174,14 +174,14 @@ void __minpack_func__(qrsolv)(const int *n, real *r__, const int *ldr,
 	    cotan = r__[k + k * r_dim1] / sdiag[k];
 /* Computing 2nd power */
 	    d__1 = cotan;
-	    sin__ = p5 / sqrt(p25 + p25 * (d__1 * d__1));
+	    sin__ = p5 / sqrtf(p25 + p25 * (d__1 * d__1));
 	    cos__ = sin__ * cotan;
 	    goto L50;
 L40:
 	    tan__ = sdiag[k] / r__[k + k * r_dim1];
 /* Computing 2nd power */
 	    d__1 = tan__;
-	    cos__ = p5 / sqrt(p25 + p25 * (d__1 * d__1));
+	    cos__ = p5 / sqrtf(p25 + p25 * (d__1 * d__1));
 	    sin__ = cos__ * tan__;
 L50:
 
@@ -228,11 +228,11 @@ L90:
     nsing = *n;
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	if (sdiag[j] == 0. && nsing == *n) {
+	if (sdiag[j] == 0.f && nsing == *n) {
 	    nsing = j - 1;
 	}
 	if (nsing < *n) {
-	    wa[j] = 0.;
+	    wa[j] = 0.f;
 	}
 /* L110: */
     }
@@ -242,7 +242,7 @@ L90:
     i__1 = nsing;
     for (k = 1; k <= i__1; ++k) {
 	j = nsing - k + 1;
-	sum = 0.;
+	sum = 0.f;
 	jp1 = j + 1;
 	if (nsing < jp1) {
 	    goto L130;

@@ -11,19 +11,19 @@
   See for example:
     http://www.netlib.org/slatec/src/denorm.f
     http://www.netlib.org/slatec/src/enorm.f
-  However, rdwarf is smaller than sqrt(FLT_MIN) = 1.0842021724855044e-19, so that rdwarf**2 will
+  However, rdwarf is smaller than sqrtf(FLT_MIN) = 1.0842021724855044e-19, so that rdwarf**2 will
   underflow. This contradicts the constraints expressed in the comments below.
 
   We changed these constants to those proposed by the
   implementation found in MPFIT http://cow.physics.wisc.edu/~craigm/idl/fitting.html
 
  cmpfit-1.2 proposes the following definitions:
-  rdwarf = sqrt(dpmpar(2)*1.5) * 10
-  rgiant = sqrt(dpmpar(3)) * 0.1
+  rdwarf = sqrtf(dpmpar(2)*1.5) * 10
+  rgiant = sqrtf(dpmpar(3)) * 0.1
 
  The half version does not really worked that way, so we use for half:
-  rdwarf = sqrt(dpmpar(2)) * 2
-  rgiant = sqrt(dpmpar(3)) * 0.5
+  rdwarf = sqrtf(dpmpar(2)) * 2
+  rgiant = sqrtf(dpmpar(3)) * 0.5
  Any suggestion is welcome. Half CMINPACK is really only a
  proof-of-concept anyway.
 
@@ -88,27 +88,27 @@ real __cminpack_func__(enorm)(int n, const real *x)
 
 /*     subprograms called */
 
-/*       fortran-supplied ... dabs,dsqrt */
+/*       fortran-supplied ... dabs,dsqrtf */
 
 /*     argonne national laboratory. minpack project. march 1980. */
 /*     burton s. garbow, kenneth e. hillstrom, jorge j. more */
 
 /*     ********** */
 
-    s1 = 0.;
-    s2 = 0.;
-    s3 = 0.;
-    x1max = 0.;
-    x3max = 0.;
+    s1 = 0.f;
+    s2 = 0.f;
+    s3 = 0.f;
+    x1max = 0.f;
+    x3max = 0.f;
     agiant = rgiant / (real)n;
     for (i = 0; i < n; ++i) {
-	xabs = fabs(x[i]);
+	xabs = fabsf(x[i]);
         if (xabs >= agiant) {
 /*              sum for large components. */
             if (xabs > x1max) {
                 /* Computing 2nd power */
                 d1 = x1max / xabs;
-                s1 = 1. + s1 * (d1 * d1);
+                s1 = 1.f + s1 * (d1 * d1);
                 x1max = xabs;
             } else {
                 /* Computing 2nd power */
@@ -120,9 +120,9 @@ real __cminpack_func__(enorm)(int n, const real *x)
             if (xabs > x3max) {
                 /* Computing 2nd power */
                 d1 = x3max / xabs;
-                s3 = 1. + s3 * (d1 * d1);
+                s3 = 1.f + s3 * (d1 * d1);
                 x3max = xabs;
-            } else if (xabs != 0.) {
+            } else if (xabs != 0.f) {
                 /* Computing 2nd power */
                 d1 = xabs / x3max;
                 s3 += d1 * d1;
@@ -136,16 +136,16 @@ real __cminpack_func__(enorm)(int n, const real *x)
 
 /*     calculation of norm. */
 
-    if (s1 != 0.) {
-        ret_val = x1max * sqrt(s1 + (s2 / x1max) / x1max);
-    } else if (s2 != 0.) {
+    if (s1 != 0.f) {
+        ret_val = x1max * sqrtf(s1 + (s2 / x1max) / x1max);
+    } else if (s2 != 0.f) {
         if (s2 >= x3max) {
-            ret_val = sqrt(s2 * (1. + (x3max / s2) * (x3max * s3)));
+            ret_val = sqrtf(s2 * (1.f + (x3max / s2) * (x3max * s3)));
         } else {
-            ret_val = sqrt(x3max * ((s2 / x3max) + (x3max * s3)));
+            ret_val = sqrtf(x3max * ((s2 / x3max) + (x3max * s3)));
         }
     } else {
-        ret_val = x3max * sqrt(s3);
+        ret_val = x3max * sqrtf(s3);
     }
     return ret_val;
 

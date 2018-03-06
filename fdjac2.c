@@ -82,7 +82,7 @@ int __cminpack_func__(fdjac2)(__cminpack_decl_fcn_mn__ void *p, int m, int n, re
 
 /*       minpack-supplied ... dpmpar */
 
-/*       fortran-supplied ... dabs,dmax1,dsqrt */
+/*       fortran-supplied ... dabs,dmax1,dsqrtf */
 
 /*     argonne national laboratory. minpack project. march 1980. */
 /*     burton s. garbow, kenneth e. hillstrom, jorge j. more */
@@ -93,11 +93,11 @@ int __cminpack_func__(fdjac2)(__cminpack_decl_fcn_mn__ void *p, int m, int n, re
 
     epsmch = __cminpack_func__(dpmpar)(1);
 
-    eps = sqrt((max(epsfcn,epsmch)));
+    eps = sqrtf((max(epsfcn,epsmch)));
     for (j = 0; j < n; ++j) {
 	temp = x[j];
-	h = eps * fabs(temp);
-	if (h == 0.) {
+	h = eps * fabsf(temp);
+	if (h == 0.f) {
 	    h = eps;
 	}
 	x[j] = temp + h;

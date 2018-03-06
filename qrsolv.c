@@ -9,8 +9,8 @@ void __cminpack_func__(qrsolv)(int n, real *r, int ldr,
 {
     /* Initialized data */
 
-#define p5 .5
-#define p25 .25
+#define p5 .5f
+#define p25 .25f
 
     /* Local variables */
     int i, j, k, l;
@@ -80,7 +80,7 @@ void __cminpack_func__(qrsolv)(int n, real *r, int ldr,
 /*         n elements of the vector (q transpose)*b. */
 
 /*       x is an output array of length n which contains the least */
-/*         squares solution of the system a*x = b, d*x = 0. */
+/*         squares solution of the system a*x = b, d*x = 0.f */
 
 /*       sdiag is an output array of length n which contains the */
 /*         diagonal elements of the upper triangular matrix s. */
@@ -89,7 +89,7 @@ void __cminpack_func__(qrsolv)(int n, real *r, int ldr,
 
 /*     subprograms called */
 
-/*       fortran-supplied ... dabs,dsqrt */
+/*       fortran-supplied ... dabs,dsqrtf */
 
 /*     argonne national laboratory. minpack project. march 1980. */
 /*     burton s. garbow, kenneth e. hillstrom, jorge j. more */
@@ -115,9 +115,9 @@ void __cminpack_func__(qrsolv)(int n, real *r, int ldr,
 /*        diagonal element using p from the qr factorization. */
 
 	l = ipvt[j]-1;
-	if (diag[l] != 0.) {
+	if (diag[l] != 0.f) {
             for (k = j; k < n; ++k) {
-                sdiag[k] = 0.;
+                sdiag[k] = 0.f;
             }
             sdiag[j] = diag[l];
 
@@ -125,25 +125,25 @@ void __cminpack_func__(qrsolv)(int n, real *r, int ldr,
 /*        modify only a single element of (q transpose)*b */
 /*        beyond the first n, which is initially zero. */
 
-            qtbpj = 0.;
+            qtbpj = 0.f;
             for (k = j; k < n; ++k) {
 
 /*           determine a givens rotation which eliminates the */
 /*           appropriate element in the current row of d. */
 
-                if (sdiag[k] != 0.) {
+                if (sdiag[k] != 0.f) {
 #                 ifdef USE_LAPACK
                     dlartg_( &r[k + k * ldr], &sdiag[k], &cos, &sin, &temp );
 #                 else /* !USE_LAPACK */
-                    if (fabs(r[k + k * ldr]) < fabs(sdiag[k])) {
+                    if (fabsf(r[k + k * ldr]) < fabsf(sdiag[k])) {
                         real cotan;
                         cotan = r[k + k * ldr] / sdiag[k];
-                        sin = p5 / sqrt(p25 + p25 * (cotan * cotan));
+                        sin = p5 / sqrtf(p25 + p25 * (cotan * cotan));
                         cos = sin * cotan;
                     } else {
                         real tan;
                         tan = sdiag[k] / r[k + k * ldr];
-                        cos = p5 / sqrt(p25 + p25 * (tan * tan));
+                        cos = p5 / sqrtf(p25 + p25 * (tan * tan));
                         sin = cos * tan;
                     }
 
@@ -184,17 +184,17 @@ void __cminpack_func__(qrsolv)(int n, real *r, int ldr,
 
     nsing = n;
     for (j = 0; j < n; ++j) {
-	if (sdiag[j] == 0. && nsing == n) {
+	if (sdiag[j] == 0.f && nsing == n) {
 	    nsing = j;
 	}
 	if (nsing < n) {
-	    wa[j] = 0.;
+	    wa[j] = 0.f;
 	}
     }
     if (nsing >= 1) {
         for (k = 1; k <= nsing; ++k) {
             j = nsing - k;
-            sum = 0.;
+            sum = 0.f;
             if (nsing > j+1) {
                 for (i = j+1; i < nsing; ++i) {
                     sum += r[i + j * ldr] * wa[i];

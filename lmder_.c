@@ -27,11 +27,11 @@ void __minpack_func__(lmder)(__minpack_decl_fcnder_mn__ const int *m, const int 
 
     /* Initialized data */
 
-#define p1 .1
-#define p5 .5
-#define p25 .25
+#define p1 .1f
+#define p5 .5f
+#define p25 .25f
 #define p75 .75
-#define p0001 1e-4
+#define p0001 1e-4f
 
     /* System generated locals */
     int fjac_dim1, fjac_offset, i__1, i__2;
@@ -145,13 +145,13 @@ void __minpack_func__(lmder)(__minpack_decl_fcnder_mn__ const int *m, const int 
 /*       mode is an integer input variable. if mode = 1, the */
 /*         variables will be scaled internally. if mode = 2, */
 /*         the scaling is specified by the input diag. other */
-/*         values of mode are equivalent to mode = 1. */
+/*         values of mode are equivalent to mode = 1.f */
 
 /*       factor is a positive input variable used in determining the */
 /*         initial step bound. this bound is set to the product of */
 /*         factor and the euclidean norm of diag*x if nonzero, or else */
 /*         to factor itself. in most cases factor should lie in the */
-/*         interval (.1,100.).100. is a generally recommended value. */
+/*         interval (.1,100.f).100. is a generally recommended value. */
 
 /*       nprint is an integer input variable that enables controlled */
 /*         printing of iterates if it is positive. in this case, */
@@ -194,7 +194,7 @@ void __minpack_func__(lmder)(__minpack_decl_fcnder_mn__ const int *m, const int 
 /*                   columns of the jacobian to machine precision. */
 
 /*       nfev is an integer output variable set to the number of */
-/*         calls to fcn with iflag = 1. */
+/*         calls to fcn with iflag = 1.f */
 
 /*       njev is an integer output variable set to the number of */
 /*         calls to fcn with iflag = 2. */
@@ -219,7 +219,7 @@ void __minpack_func__(lmder)(__minpack_decl_fcnder_mn__ const int *m, const int 
 
 /*       minpack-supplied ... dpmpar,enorm,lmpar,qrfac */
 
-/*       fortran-supplied ... dabs,dmax1,dmin1,dsqrt,mod */
+/*       fortran-supplied ... dabs,dmax1,dmin1,dsqrtf,mod */
 
 /*     argonne national laboratory. minpack project. march 1980. */
 /*     burton s. garbow, kenneth e. hillstrom, jorge j. more */
@@ -252,8 +252,8 @@ void __minpack_func__(lmder)(__minpack_decl_fcnder_mn__ const int *m, const int 
 
 /*     check the input parameters for errors. */
 
-    if (*n <= 0 || *m < *n || *ldfjac < *m || *ftol < 0. || *xtol < 0. || 
-	    *gtol < 0. || *maxfev <= 0 || *factor <= 0.) {
+    if (*n <= 0 || *m < *n || *ldfjac < *m || *ftol < 0.f || *xtol < 0.f || 
+	    *gtol < 0.f || *maxfev <= 0 || *factor <= 0.f) {
 	goto L300;
     }
     if (*mode != 2) {
@@ -261,7 +261,7 @@ void __minpack_func__(lmder)(__minpack_decl_fcnder_mn__ const int *m, const int 
     }
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	if (diag[j] <= 0.) {
+	if (diag[j] <= 0.f) {
 	    goto L300;
 	}
 /* L10: */
@@ -281,7 +281,7 @@ L20:
 
 /*     initialize levenberg-marquardt parameter and iteration counter. */
 
-    par = 0.;
+    par = 0.f;
     iter = 1;
 
 /*     beginning of the outer loop. */
@@ -328,8 +328,8 @@ L40:
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
 	diag[j] = wa2[j];
-	if (wa2[j] == 0.) {
-	    diag[j] = 1.;
+	if (wa2[j] == 0.f) {
+	    diag[j] = 1.f;
 	}
 /* L50: */
     }
@@ -345,7 +345,7 @@ L60:
     }
     xnorm = __minpack_func__(enorm)(n, &wa3[1]);
     delta = *factor * xnorm;
-    if (delta == 0.) {
+    if (delta == 0.f) {
 	delta = *factor;
     }
 L80:
@@ -360,10 +360,10 @@ L80:
     }
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	if (fjac[j + j * fjac_dim1] == 0.) {
+	if (fjac[j + j * fjac_dim1] == 0.f) {
 	    goto L120;
 	}
-	sum = 0.;
+	sum = 0.f;
 	i__2 = *m;
 	for (i__ = j; i__ <= i__2; ++i__) {
 	    sum += fjac[i__ + j * fjac_dim1] * wa4[i__];
@@ -383,24 +383,24 @@ L120:
 
 /*        compute the norm of the scaled gradient. */
 
-    gnorm = 0.;
-    if (fnorm == 0.) {
+    gnorm = 0.f;
+    if (fnorm == 0.f) {
 	goto L170;
     }
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
 	l = ipvt[j];
-	if (wa2[l] == 0.) {
+	if (wa2[l] == 0.f) {
 	    goto L150;
 	}
-	sum = 0.;
+	sum = 0.f;
 	i__2 = j;
 	for (i__ = 1; i__ <= i__2; ++i__) {
 	    sum += fjac[i__ + j * fjac_dim1] * (qtf[i__] / fnorm);
 /* L140: */
 	}
 /* Computing MAX */
-	d__2 = gnorm, d__3 = fabs(sum / wa2[l]);
+	d__2 = gnorm, d__3 = fabsf(sum / wa2[l]);
 	gnorm = max(d__2,d__3);
 L150:
 /* L160: */
@@ -469,11 +469,11 @@ L200:
 
 /*           compute the scaled actual reduction. */
 
-    actred = -1.;
+    actred = -1.f;
     if (p1 * fnorm1 < fnorm) {
 /* Computing 2nd power */
 	d__1 = fnorm1 / fnorm;
-	actred = 1. - d__1 * d__1;
+	actred = 1.f - d__1 * d__1;
     }
 
 /*           compute the scaled predicted reduction and */
@@ -481,7 +481,7 @@ L200:
 
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	wa3[j] = 0.;
+	wa3[j] = 0.f;
 	l = ipvt[j];
 	temp = wa1[l];
 	i__2 = j;
@@ -492,7 +492,7 @@ L200:
 /* L230: */
     }
     temp1 = __minpack_func__(enorm)(n, &wa3[1]) / fnorm;
-    temp2 = sqrt(par) * pnorm / fnorm;
+    temp2 = sqrtf(par) * pnorm / fnorm;
 /* Computing 2nd power */
     d__1 = temp1;
 /* Computing 2nd power */
@@ -507,8 +507,8 @@ L200:
 /*           compute the ratio of the actual to the predicted */
 /*           reduction. */
 
-    ratio = 0.;
-    if (prered != 0.) {
+    ratio = 0.f;
+    if (prered != 0.f) {
 	ratio = actred / prered;
     }
 
@@ -517,10 +517,10 @@ L200:
     if (ratio > p25) {
 	goto L240;
     }
-    if (actred >= 0.) {
+    if (actred >= 0.f) {
 	temp = p5;
     }
-    if (actred < 0.) {
+    if (actred < 0.f) {
 	temp = p5 * dirder / (dirder + p5 * actred);
     }
     if (p1 * fnorm1 >= fnorm || temp < p1) {
@@ -532,7 +532,7 @@ L200:
     par /= temp;
     goto L260;
 L240:
-    if (par != 0. && ratio < p75) {
+    if (par != 0.f && ratio < p75) {
 	goto L250;
     }
     delta = pnorm / p5;
@@ -566,13 +566,13 @@ L290:
 
 /*           tests for convergence. */
 
-    if (fabs(actred) <= *ftol && prered <= *ftol && p5 * ratio <= 1.) {
+    if (fabsf(actred) <= *ftol && prered <= *ftol && p5 * ratio <= 1.f) {
 	*info = 1;
     }
     if (delta <= *xtol * xnorm) {
 	*info = 2;
     }
-    if (fabs(actred) <= *ftol && prered <= *ftol && p5 * ratio <= 1. && *info 
+    if (fabsf(actred) <= *ftol && prered <= *ftol && p5 * ratio <= 1.f && *info 
 	    == 2) {
 	*info = 3;
     }
@@ -585,7 +585,7 @@ L290:
     if (*nfev >= *maxfev) {
 	*info = 5;
     }
-    if (fabs(actred) <= epsmch && prered <= epsmch && p5 * ratio <= 1.) {
+    if (fabsf(actred) <= epsmch && prered <= epsmch && p5 * ratio <= 1.f) {
 	*info = 6;
     }
     if (delta <= epsmch * xnorm) {

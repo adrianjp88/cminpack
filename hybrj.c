@@ -17,10 +17,10 @@ int __cminpack_func__(hybrj)(__cminpack_decl_fcnder_nn__ void *p, int n, real *x
 {
     /* Initialized data */
 
-#define p1 .1
-#define p5 .5
-#define p001 .001
-#define p0001 1e-4
+#define p1 .1f
+#define p5 .5f
+#define p001 .001f
+#define p0001 1e-4f
 
     /* System generated locals */
     int fjac_dim1, fjac_offset;
@@ -33,12 +33,12 @@ int __cminpack_func__(hybrj)(__cminpack_decl_fcnder_nn__ void *p, int n, real *x
     int iter;
     real temp;
     int iflag;
-    real delta = 0.;
+    real delta = 0.f;
     int jeval;
     int ncsuc;
     real ratio;
     real fnorm;
-    real pnorm, xnorm = 0., fnorm1;
+    real pnorm, xnorm = 0.f, fnorm1;
     int nslow1, nslow2;
     int ncfail;
     real actred, epsmch, prered;
@@ -115,13 +115,13 @@ int __cminpack_func__(hybrj)(__cminpack_decl_fcnder_nn__ void *p, int n, real *x
 /*       mode is an integer input variable. if mode = 1, the */
 /*         variables will be scaled internally. if mode = 2, */
 /*         the scaling is specified by the input diag. other */
-/*         values of mode are equivalent to mode = 1. */
+/*         values of mode are equivalent to mode = 1.f */
 
 /*       factor is a positive input variable used in determining the */
 /*         initial step bound. this bound is set to the product of */
 /*         factor and the euclidean norm of diag*x if nonzero, or else */
 /*         to factor itself. in most cases factor should lie in the */
-/*         interval (.1,100.). 100. is a generally recommended value. */
+/*         interval (.1,100.f). 100. is a generally recommended value. */
 
 /*       nprint is an integer input variable that enables controlled */
 /*         printing of iterates if it is positive. in this case, */
@@ -157,7 +157,7 @@ int __cminpack_func__(hybrj)(__cminpack_decl_fcnder_nn__ void *p, int n, real *x
 /*                    ten iterations. */
 
 /*       nfev is an integer output variable set to the number of */
-/*         calls to fcn with iflag = 1. */
+/*         calls to fcn with iflag = 1.f */
 
 /*       njev is an integer output variable set to the number of */
 /*         calls to fcn with iflag = 2. */
@@ -214,13 +214,13 @@ int __cminpack_func__(hybrj)(__cminpack_decl_fcnder_nn__ void *p, int n, real *x
 
 /*     check the input parameters for errors. */
 
-    if (n <= 0 || ldfjac < n || xtol < 0. || maxfev <= 0 || factor <= 
-	    0. || lr < n * (n + 1) / 2) {
+    if (n <= 0 || ldfjac < n || xtol < 0.f || maxfev <= 0 || factor <= 
+	    0.f || lr < n * (n + 1) / 2) {
 	goto TERMINATE;
     }
     if (mode == 2) {
         for (j = 1; j <= n; ++j) {
-            if (diag[j] <= 0.) {
+            if (diag[j] <= 0.f) {
                 goto TERMINATE;
             }
         }
@@ -269,8 +269,8 @@ int __cminpack_func__(hybrj)(__cminpack_decl_fcnder_nn__ void *p, int n, real *x
             if (mode != 2) {
                 for (j = 1; j <= n; ++j) {
                     diag[j] = wa2[j];
-                    if (wa2[j] == 0.) {
-                        diag[j] = 1.;
+                    if (wa2[j] == 0.f) {
+                        diag[j] = 1.f;
                     }
                 }
             }
@@ -283,7 +283,7 @@ int __cminpack_func__(hybrj)(__cminpack_decl_fcnder_nn__ void *p, int n, real *x
             }
             xnorm = __cminpack_enorm__(n, &wa3[1]);
             delta = factor * xnorm;
-            if (delta == 0.) {
+            if (delta == 0.f) {
                 delta = factor;
             }
         }
@@ -294,8 +294,8 @@ int __cminpack_func__(hybrj)(__cminpack_decl_fcnder_nn__ void *p, int n, real *x
             qtf[i] = fvec[i];
         }
         for (j = 1; j <= n; ++j) {
-            if (fjac[j + j * fjac_dim1] != 0.) {
-                sum = 0.;
+            if (fjac[j + j * fjac_dim1] != 0.f) {
+                sum = 0.f;
                 for (i = j; i <= n; ++i) {
                     sum += fjac[i + j * fjac_dim1] * qtf[i];
                 }
@@ -319,7 +319,7 @@ int __cminpack_func__(hybrj)(__cminpack_decl_fcnder_nn__ void *p, int n, real *x
                 }
             }
             r[l] = wa1[j];
-            if (wa1[j] == 0.) {
+            if (wa1[j] == 0.f) {
                 sing = TRUE_;
             }
         }
@@ -384,18 +384,18 @@ int __cminpack_func__(hybrj)(__cminpack_decl_fcnder_nn__ void *p, int n, real *x
 
 /*           compute the scaled actual reduction. */
 
-            actred = -1.;
+            actred = -1.f;
             if (fnorm1 < fnorm) {
                 /* Computing 2nd power */
                 d1 = fnorm1 / fnorm;
-                actred = 1. - d1 * d1;
+                actred = 1.f - d1 * d1;
             }
 
 /*           compute the scaled predicted reduction. */
 
             l = 1;
             for (i = 1; i <= n; ++i) {
-                sum = 0.;
+                sum = 0.f;
                 for (j = i; j <= n; ++j) {
                     sum += r[l] * wa1[j];
                     ++l;
@@ -403,18 +403,18 @@ int __cminpack_func__(hybrj)(__cminpack_decl_fcnder_nn__ void *p, int n, real *x
                 wa3[i] = qtf[i] + sum;
             }
             temp = __cminpack_enorm__(n, &wa3[1]);
-            prered = 0.;
+            prered = 0.f;
             if (temp < fnorm) {
                 /* Computing 2nd power */
                 d1 = temp / fnorm;
-                prered = 1. - d1 * d1;
+                prered = 1.f - d1 * d1;
             }
 
 /*           compute the ratio of the actual to the predicted */
 /*           reduction. */
 
-            ratio = 0.;
-            if (prered > 0.) {
+            ratio = 0.f;
+            if (prered > 0.f) {
                 ratio = actred / prered;
             }
 
@@ -432,7 +432,7 @@ int __cminpack_func__(hybrj)(__cminpack_decl_fcnder_nn__ void *p, int n, real *x
                     d1 = pnorm / p5;
                     delta = max(delta,d1);
                 }
-                if (fabs(ratio - 1.) <= p1) {
+                if (fabsf(ratio - 1.f) <= p1) {
                     delta = pnorm / p5;
                 }
             }
@@ -468,7 +468,7 @@ int __cminpack_func__(hybrj)(__cminpack_decl_fcnder_nn__ void *p, int n, real *x
 
 /*           test for convergence. */
 
-            if (delta <= xtol * xnorm || fnorm == 0.) {
+            if (delta <= xtol * xnorm || fnorm == 0.f) {
                 info = 1;
             }
             if (info != 0) {
@@ -505,7 +505,7 @@ int __cminpack_func__(hybrj)(__cminpack_decl_fcnder_nn__ void *p, int n, real *x
 /*           and update qtf if necessary. */
 
             for (j = 1; j <= n; ++j) {
-                sum = 0.;
+                sum = 0.f;
                 for (i = 1; i <= n; ++i) {
                     sum += fjac[i + j * fjac_dim1] * wa4[i];
                 }

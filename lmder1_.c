@@ -59,7 +59,7 @@ void __minpack_func__(lmder1)(__minpack_decl_fcnder_mn__ const int *m, const int
 /*         end */
 
 /*         the value of iflag should not be changed by fcn unless */
-/*         the user wants to terminate execution of lmder1. */
+/*         the user wants to terminate execution of lmder1.f */
 /*         in this case set iflag to a negative integer. */
 
 /*       m is a positive integer input variable set to the number */
@@ -159,7 +159,7 @@ void __minpack_func__(lmder1)(__minpack_decl_fcnder_mn__ const int *m, const int
 
 /*     check the input parameters for errors. */
 
-    if (*n <= 0 || *m < *n || *ldfjac < *m || *tol < 0. || *lwa < *n * 5 + *
+    if (*n <= 0 || *m < *n || *ldfjac < *m || *tol < 0.f || *lwa < *n * 5 + *
 	    m) {
 	/* goto L10; */
         return;
@@ -170,7 +170,7 @@ void __minpack_func__(lmder1)(__minpack_decl_fcnder_mn__ const int *m, const int
     maxfev = (*n + 1) * 100;
     ftol = *tol;
     xtol = *tol;
-    gtol = 0.;
+    gtol = 0.f;
     mode = 1;
     nprint = 0;
     __minpack_func__(lmder)(__minpack_param_fcnder_mn__ m, n, &x[1], &fvec[1], &fjac[fjac_offset], ldfjac, &
@@ -183,7 +183,7 @@ void __minpack_func__(lmder1)(__minpack_decl_fcnder_mn__ const int *m, const int
 /* L10: */
     return;
 
-/*     last card of subroutine lmder1. */
+/*     last card of subroutine lmder1.f */
 
 } /* lmder1_ */
 

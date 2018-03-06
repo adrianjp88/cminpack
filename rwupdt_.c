@@ -16,8 +16,8 @@ void __minpack_func__(rwupdt)(const int *n, real *r__, const int *ldr,
 {
     /* Initialized data */
 
-#define p5 .5
-#define p25 .25
+#define p5 .5f
+#define p25 .25f
 
     /* System generated locals */
     int r_dim1, r_offset, i__1, i__2;
@@ -81,7 +81,7 @@ void __minpack_func__(rwupdt)(const int *n, real *r__, const int *ldr,
 
 /*     subprograms called */
 
-/*       fortran-supplied ... dabs,dsqrt */
+/*       fortran-supplied ... dabs,dsqrtf */
 
 /*     argonne national laboratory. minpack project. march 1980. */
 /*     burton s. garbow, dudley v. goetschel, kenneth e. hillstrom, */
@@ -121,9 +121,9 @@ L20:
 
 /*        determine a givens rotation which eliminates w(j). */
 
-	cos__[j] = 1.;
-	sin__[j] = 0.;
-	if (rowj == 0.) {
+	cos__[j] = 1.f;
+	sin__[j] = 0.f;
+	if (rowj == 0.f) {
 	    goto L50;
 	}
 	if ((d__1 = r__[j + j * r_dim1], abs(d__1)) >= abs(rowj)) {
@@ -132,14 +132,14 @@ L20:
 	cotan = r__[j + j * r_dim1] / rowj;
 /* Computing 2nd power */
 	d__1 = cotan;
-	sin__[j] = p5 / sqrt(p25 + p25 * (d__1 * d__1));
+	sin__[j] = p5 / sqrtf(p25 + p25 * (d__1 * d__1));
 	cos__[j] = sin__[j] * cotan;
 	goto L40;
 L30:
 	tan__ = rowj / r__[j + j * r_dim1];
 /* Computing 2nd power */
 	d__1 = tan__;
-	cos__[j] = p5 / sqrt(p25 + p25 * (d__1 * d__1));
+	cos__[j] = p5 / sqrtf(p25 + p25 * (d__1 * d__1));
 	sin__[j] = cos__[j] * tan__;
 L40:
 

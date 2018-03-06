@@ -89,7 +89,7 @@ building a DLL on windows.
 #define __cminpack_attr__
 #ifndef __cminpack_real__
 #define __cminpack_double__
-#define __cminpack_real__ double
+#define __cminpack_real__ float
 #endif
 #define __cminpack_type_fcn_nn__        typedef int (*cminpack_func_nn)
 #define __cminpack_type_fcnder_nn__     typedef int (*cminpack_funcder_nn)
@@ -113,7 +113,7 @@ building a DLL on windows.
 #endif
 
 #ifdef __cminpack_float__
-#define __cminpack_func__(func) s ## func
+#define __cminpack_func__(func) func
 #endif
 
 #ifdef __cminpack_half__
